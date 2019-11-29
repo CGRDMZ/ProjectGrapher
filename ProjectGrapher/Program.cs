@@ -57,6 +57,7 @@ namespace ProjectGrapher
                     if (cki.Key == ConsoleKey.RightArrow)
                     {
                         cursorX++;
+                        // yorum bu
                     }
                 }
                 while (Console.KeyAvailable)
