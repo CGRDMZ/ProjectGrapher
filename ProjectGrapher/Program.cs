@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
 
 namespace ProjectGrapher
 {
@@ -25,6 +24,12 @@ namespace ProjectGrapher
                 }
                 Console.Write("\n");
             }
+        }
+
+        private static void drawText(int x, int y, string text)
+        {
+            Console.SetCursorPosition(x, y);
+            Console.Write(text);
         }
 
         private static char[,] loadGraph(string path)
@@ -85,7 +90,11 @@ namespace ProjectGrapher
 
             Random rand = new Random();
 
+            bool flag = true;
+
             ConsoleKeyInfo cki;
+            ConsoleKeyInfo ckiDraw;
+            ConsoleKeyInfo ckiCalc;
             Console.CursorVisible = false;
 
             for (int i = 0; i < graph.GetLength(0); i++)
@@ -112,82 +121,86 @@ namespace ProjectGrapher
                 cki = Console.ReadKey(true);
                 option = (int)cki.Key;
                 nthMatrixInput = 1;
-                cki = default;
-                
-
 
                 if (option == (int)ConsoleKey.D1)
                 {
+                    Console.Clear();
+
                     // drawing a graph
                     while (true)
                     {
-                        
-
-                        // going up
-                        if (cki.Key == ConsoleKey.UpArrow)
-                        {
-                            cursorY--;
-                        }
-                        else
-                        //going down
-                        if (cki.Key == ConsoleKey.DownArrow)
-                        {
-                            cursorY++;
-                        }
-                        else
-                        //going left
-                        if (cki.Key == ConsoleKey.LeftArrow)
-                        {
-                            cursorX--;
-                        }
-                        else
-                        //going down
-                        if (cki.Key == ConsoleKey.RightArrow)
-                        {
-                            cursorX++;
-                        }
-                        else
-                        //put an  arrow
-                        if (cki.Key == ConsoleKey.Spacebar)
-                        {
-                            graph[cursorY, cursorX] = '+';
-                        }
-                        else
-                        //put X which means the head of the arrow
-                        if (cki.Key == ConsoleKey.X)
-                        {
-                            graph[cursorY, cursorX] = 'X';
-                        }
-                        else if (cki.Key == ConsoleKey.Escape)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            graph[cursorY, cursorX] = char.ToUpper(cki.KeyChar);
-                        }
-
                         drawGraph(graphXOffset, graphYOffset, graph);
 
                         // draws the cursor
                         Console.SetCursorPosition(graphXOffset + cursorX, graphYOffset + cursorY);
                         Console.Write("?");
 
-                        cki = Console.ReadKey(true);
-                    }
-                }
-                else if (option == (int)ConsoleKey.D2) // calculations andd stuff
-                {
-                    while (true)
-                    {
+                        ckiDraw = Console.ReadKey(true);
 
-                        if (cki.Key == ConsoleKey.Escape)
+                        // going up
+                        if (ckiDraw.Key == ConsoleKey.UpArrow)
+                        {
+                            cursorY--;
+                        }
+                        else
+                        //going down
+                        if (ckiDraw.Key == ConsoleKey.DownArrow)
+                        {
+                            cursorY++;
+                        }
+                        else
+                        //going left
+                        if (ckiDraw.Key == ConsoleKey.LeftArrow)
+                        {
+                            cursorX--;
+                        }
+                        else
+                        //going down
+                        if (ckiDraw.Key == ConsoleKey.RightArrow)
+                        {
+                            cursorX++;
+                        }
+                        else
+                        //put an  arrow
+                        if (ckiDraw.Key == ConsoleKey.Spacebar)
+                        {
+                            graph[cursorY, cursorX] = '+';
+                        }
+                        else
+                        //put X which means the head of the arrow
+                        if (ckiDraw.Key == ConsoleKey.X)
+                        {
+                            graph[cursorY, cursorX] = 'X';
+                        }
+                        else if (ckiDraw.Key == ConsoleKey.Escape)
                         {
                             break;
                         }
                         else
                         {
-                            nthMatrixInput = Convert.ToInt32(cki);
+                            graph[cursorY, cursorX] = char.ToUpper(ckiDraw.KeyChar);
+                        }
+                    }
+                }
+                else if (option == (int)ConsoleKey.D2) // calculations andd stuff
+                {
+                    Console.Clear();
+                    flag = true;
+                    while (true)
+                    {
+                        drawGraph(graphXOffset, graphYOffset, graph);
+                        drawText(50, 4, $"r{nthMatrixInput} matrix is:");
+                        drawGraph(50, 5, nthMatrix, 1);
+
+                        ckiCalc = Console.ReadKey(true);
+
+                        if (ckiCalc.Key == ConsoleKey.Escape)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            nthMatrixInput = Convert.ToInt32(Int32.Parse(ckiCalc.KeyChar.ToString()));
                         }
 
                         //counting node number
@@ -202,43 +215,32 @@ namespace ProjectGrapher
                                 }
                             }
                         }
-
-                        // defining the r matricies
-                        rMatrix = new int[nodeCount, nodeCount];
-                        for (int row = 0; row < rMatrix.GetLength(0); row++)
+                        if (flag)
                         {
-                            for (int col = 0; col < rMatrix.GetLength(1); col++)
+                            // defining the r matricies
+                            rMatrix = new int[nodeCount, nodeCount];
+                            for (int row = 0; row < rMatrix.GetLength(0); row++)
                             {
-                                // assigns one and zeros randomly for debugging
-                                if (rand.Next(2) == 0)
+                                for (int col = 0; col < rMatrix.GetLength(1); col++)
                                 {
-                                    rMatrix[row, col] = 0;
-                                }
-                                else
-                                {
-                                    rMatrix[row, col] = 1;
+                                    // assigns one and zeros randomly for debugging
+                                    rMatrix[row, col] = rand.Next(2);
                                 }
                             }
+                            flag = false;
                         }
+
                         nthMatrix = rMatrix;
                         // calculate the nth matrix
-                        for (int i = 0; i < nthMatrixInput; i++)
+                        for (int i = 1; i < nthMatrixInput; i++)
                         {
                             nthMatrix = matrixMultipicator2D(nthMatrix, rMatrix);
                         }
-
-                        Console.SetCursorPosition(Console.WindowWidth - 10, 0);
-                        Console.Write(nthMatrixInput);
-
-                        drawGraph(graphXOffset, graphYOffset, graph);
-                        drawGraph(50, 5, rMatrix, 1);
-
-
-                        cki = Console.ReadKey(true);
                     }
                 }
                 else if (option == (int)ConsoleKey.D3)
                 {
+                    Console.Clear();
                     Console.WriteLine("please enter the name of the graph:");
                     string name = Console.ReadLine();
                     graph = loadGraph($"{name}.txt");
