@@ -86,6 +86,8 @@ namespace ProjectGrapher
 
             int[,] rMatrix = new int[1, 1];
             int[,] nthMatrix = new int[1, 1];
+            int[,] rStarMatrix = new int[1, 1];
+
             int nthMatrixInput = 1;
 
             Random rand = new Random();
@@ -188,20 +190,11 @@ namespace ProjectGrapher
                     flag = true;
                     while (true)
                     {
-                        drawGraph(graphXOffset, graphYOffset, graph);
-                        drawText(50, 4, $"r{nthMatrixInput} matrix is:");
-                        drawGraph(50, 5, nthMatrix, 1);
+                        
 
-                        ckiCalc = Console.ReadKey(true);
 
-                        if (ckiCalc.Key == ConsoleKey.Escape)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            nthMatrixInput = Convert.ToInt32(Int32.Parse(ckiCalc.KeyChar.ToString()));
-                        }
+
+                        
 
                         //counting node number
                         nodeCount = 0;
@@ -230,12 +223,67 @@ namespace ProjectGrapher
                             flag = false;
                         }
 
-                        nthMatrix = rMatrix;
+
+                        // calculate r star
+                        rStarMatrix = new int[nodeCount,nodeCount];
+                        nthMatrix = new int[nodeCount, nodeCount];
+
+
+
+                        for (int i = 0; i < rMatrix.GetLength(0); i++)
+                        {
+                            for (int j = 0; j < rMatrix.GetLength(1); j++)
+                            {
+                                nthMatrix[i, j] = rMatrix[i, j];
+                            }
+                        }
+                        for (int i = 0; i < nodeCount; i++)
+                        {
+                            for (int row = 0; row < rStarMatrix.GetLength(0); row++)
+                            {
+                                for (int col = 0; col < rStarMatrix.GetLength(1); col++)
+                                {
+                                    if (nthMatrix[row, col] == 1)
+                                    {
+                                        rStarMatrix[row, col] = 1;
+                                    }
+                                }
+                            }
+                            nthMatrix = matrixMultipicator2D(nthMatrix, rMatrix);
+                        }
+
                         // calculate the nth matrix
+                        for (int i = 0; i < rMatrix.GetLength(0); i++)
+                        {
+                            for (int j = 0; j < rMatrix.GetLength(1); j++)
+                            {
+                                nthMatrix[i, j] = rMatrix[i, j];
+                            }
+                        }
                         for (int i = 1; i < nthMatrixInput; i++)
                         {
                             nthMatrix = matrixMultipicator2D(nthMatrix, rMatrix);
                         }
+
+                        drawGraph(graphXOffset, graphYOffset, graph);
+
+                        drawText(80, 4, $"r{nthMatrixInput} matrix is:");
+                        drawGraph(80, 5, nthMatrix, 1);
+
+                        drawText(80, 15, "r* matrix is:");
+                        drawGraph(80, 16, rStarMatrix, 1);
+
+                        ckiCalc = Console.ReadKey(true);
+
+                        if (ckiCalc.Key == ConsoleKey.Escape)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            nthMatrixInput = Convert.ToInt32(Int32.Parse(ckiCalc.KeyChar.ToString()));
+                        }
+
                     }
                 }
                 else if (option == (int)ConsoleKey.D3)
