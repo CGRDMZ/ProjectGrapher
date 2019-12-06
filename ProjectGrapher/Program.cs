@@ -9,8 +9,9 @@ namespace ProjectGrapher
         public const int graphHeight = 25;
 
         public static int nodeCount = 0;
+        public static char[] nodeNames = new char[1];
 
-
+        public static int[,] rMatrix = new int[1, 1];
 
         private static void drawGraph(int x, int y, dynamic array, int emptySpace = 0)
         {
@@ -74,17 +75,164 @@ namespace ProjectGrapher
             return matrix3;
         }
 
-        //private static int[,] findRelation(char[,] graph)
-        //{
-        //    for (int row = 0; row < graph.GetLength(0); row++)
-        //    {
-        //        for (int col = 0; col < graph.GetLength(1); col++)
-        //        {
+        private static char[] findNeighbours(int row, int col, char[,] graph)
+        {
+            char[] neighbours = new char[8];
+            // neighbours are added like that
+            // 0 1 2
+            // 3 N 4
+            // 5 6 7
 
-        //        }
-        //    }
-        //}
 
+            int counter = 0;
+            for (int k = -1; k < 2; k++)
+            {
+                for (int l = -1; l < 2; l++)
+                {
+                    if (!(k == 0 && l == 0) && row + k > 0 && row + k < graph.GetLength(0) && col + l > 0 && col + l < graph.GetLength(1))
+                    {
+                        neighbours[counter] = graph[row + k, col + l];
+                        if (counter < neighbours.Length - 1)
+                        {
+                            counter++;
+                        }
+                    }
+                }
+            }
+            return neighbours;
+        }
+
+        private static int[,] findRelation(char[,] graph)
+        {
+            int[,] rMatrix = new int[nodeCount, nodeCount];
+
+            int i = 0;
+            char node;
+            char[] nodeNeighbours = new char[8];
+
+            int indexX;
+            int indexY;
+
+            for (int row = 0; row < graph.GetLength(0); row++)
+            {
+                for (int col = 0; col < graph.GetLength(1); col++)
+                {
+                    if (graph[row, col] == nodeNames[i])
+                    {
+                        node = nodeNames[i];
+
+                        nodeNeighbours = findNeighbours(row, col, graph);
+                        indexX = col;
+                        indexY = row;
+
+                        // tracing algorithm
+                        for (int j = 0; j < nodeNeighbours.Length; j++)
+                        {
+                            indexX = col;
+                            indexY = row;
+
+                            if (nodeNeighbours[j] == '+')
+                            {
+                                if (j == 0)// going to north west
+                                {
+                                    indexX -= 1;
+                                    indexY -= 1;
+                                    while (graph[indexY - 1,indexX - 1] == '+')
+                                    {
+                                        indexX -= 1;
+                                        indexY -= 1;
+                                        drawText(indexX, indexY, "!");
+                                    }
+
+                                }
+                                else if (j == 1)
+                                {
+                                    indexY -= 1;
+                                    while (graph[indexY - 1, indexX] == '+')
+                                    {
+                                        indexY -= 1;
+                                        drawText(indexX, indexY, "!");
+                                    }
+                                }
+                                else if (j == 2)
+                                {
+                                    indexX += 1;
+                                    indexY -= 1;
+                                    while (graph[indexY - 1, indexX + 1] == '+')
+                                    {
+                                        indexX += 1;
+                                        indexY -= 1;
+                                        drawText(indexX, indexY, "!");
+                                    }
+                                }
+                                else if (j == 3)
+                                {
+                                    indexX -= 1;
+                                    while (graph[indexY, indexX - 1] == '+')
+                                    {
+                                        indexX -= 1;
+                                        drawText(indexX, indexY, "!");
+                                    }
+                                }
+                                else if (j == 4)
+                                {
+                                    indexX += 1;
+                                    while (graph[indexY, indexX + 1] == '+')
+                                    {
+                                        indexX += 1;
+                                        drawText(indexX, indexY, "!");
+                                    }
+                                }
+                                else if (j == 5)
+                                {
+                                    indexX -= 1;
+                                    indexY += 1;
+                                    while (graph[indexY + 1, indexX - 1] == '+')
+                                    {
+                                        indexX -= 1;
+                                        indexY += 1;
+                                        drawText(indexX, indexY, "!");
+                                    }
+                                }
+                                else if (j == 6)
+                                {
+                                    indexY += 1;
+                                    while (graph[indexY + 1, indexX] == '+')
+                                    {
+                                        indexY += 1;
+                                        drawText(indexX, indexY, "!");
+                                    }
+                                }
+                                else if (j == 7)
+                                {
+                                    indexX += 1;
+                                    indexY -= 1;
+                                    while (graph[indexY + 1, indexX + 1] == '+')
+                                    {
+                                        indexX += 1;
+                                        indexY += 1;
+                                        drawText(indexX, indexY, "!");
+                                    }
+                                }
+                                if (true)
+                                {
+
+                                }
+                            }
+                        }
+
+                        if (i < nodeNames.Length - 1)
+                        {
+                            i++;
+                        }
+                        row = 0;
+                        col = 0;
+                        break;
+                    }
+                }
+            }
+            return rMatrix;
+        }
 
         private static void Main(string[] args)
         {
@@ -98,11 +246,8 @@ namespace ProjectGrapher
             int graphXOffset = 0;
             int graphYOffset = 0;
 
-            int[,] rMatrix = new int[1, 1];
             int[,] nthMatrix = new int[1, 1];
             int[,] rStarMatrix = new int[1, 1];
-
-            char[] nodeNames = new char[1];
 
             int nthMatrixInput = 1;
 
@@ -212,7 +357,7 @@ namespace ProjectGrapher
                         {
                             for (int col = 0; col < graph.GetLength(1); col++)
                             {
-                                if (graph[row, col] != '.' && graph[row, col] != 'X' && graph[row, col] != '+')
+                                if (graph[row, col] != '.' && graph[row, col] != 'X' && graph[row, col] != '+' && graph[row, col] <= 'H' && graph[row, col] >= 'A')
                                 {
                                     nodeCount++;
                                 }
@@ -226,31 +371,37 @@ namespace ProjectGrapher
                         {
                             for (int col = 0; col < graph.GetLength(1); col++)
                             {
-                                if (graph[row, col] != '.' && graph[row, col] != 'X' && graph[row, col] != '+')
+                                if (graph[row, col] != '.' && graph[row, col] != 'X' && graph[row, col] != '+' && graph[row,col] <= 'H' && graph[row,col] >= 'A')
                                 {
                                     nodeNames[counter] = graph[row, col];
                                     counter++;
                                 }
                             }
                         }
+
                         Array.Sort(nodeNames);
+
+                        //if (flag)
+                        //{
+                        //    // defining the r matricies
+                        //    rMatrix = new int[nodeCount, nodeCount];
+                        //    for (int row = 0; row < rMatrix.GetLength(0); row++)
+                        //    {
+                        //        for (int col = 0; col < rMatrix.GetLength(1); col++)
+                        //        {
+                        //            // assigns one and zeros randomly for debugging
+                        //            rMatrix[row, col] = rand.Next(2);
+                        //        }
+                        //    }
+                        //    flag = false;
+                        //}
+
 
                         if (flag)
                         {
-                            // defining the r matricies
-                            rMatrix = new int[nodeCount, nodeCount];
-                            for (int row = 0; row < rMatrix.GetLength(0); row++)
-                            {
-                                for (int col = 0; col < rMatrix.GetLength(1); col++)
-                                {
-                                    // assigns one and zeros randomly for debugging
-                                    rMatrix[row, col] = rand.Next(2);
-                                }
-                            }
+                            rMatrix = findRelation(graph);
                             flag = false;
                         }
-
-                        //findRelation(graph);
 
                         // calculate r star
                         rStarMatrix = new int[nodeCount, nodeCount];
