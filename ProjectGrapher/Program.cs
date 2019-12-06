@@ -8,6 +8,10 @@ namespace ProjectGrapher
         public const int graphWidth = 40;
         public const int graphHeight = 25;
 
+        public static int nodeCount = 0;
+
+
+
         private static void drawGraph(int x, int y, dynamic array, int emptySpace = 0)
         {
             // draw graph every loop
@@ -70,11 +74,21 @@ namespace ProjectGrapher
             return matrix3;
         }
 
+        //private static int[,] findRelation(char[,] graph)
+        //{
+        //    for (int row = 0; row < graph.GetLength(0); row++)
+        //    {
+        //        for (int col = 0; col < graph.GetLength(1); col++)
+        //        {
+
+        //        }
+        //    }
+        //}
+
+
         private static void Main(string[] args)
         {
             char[,] graph = new char[graphHeight, graphWidth];
-
-            int nodeCount = 0;
 
             int option;
 
@@ -87,6 +101,8 @@ namespace ProjectGrapher
             int[,] rMatrix = new int[1, 1];
             int[,] nthMatrix = new int[1, 1];
             int[,] rStarMatrix = new int[1, 1];
+
+            char[] nodeNames = new char[1];
 
             int nthMatrixInput = 1;
 
@@ -190,12 +206,6 @@ namespace ProjectGrapher
                     flag = true;
                     while (true)
                     {
-                        
-
-
-
-                        
-
                         //counting node number
                         nodeCount = 0;
                         for (int row = 0; row < graph.GetLength(0); row++)
@@ -208,6 +218,23 @@ namespace ProjectGrapher
                                 }
                             }
                         }
+
+                        // find nodes
+                        nodeNames = new char[nodeCount];
+                        int counter = 0;
+                        for (int row = 0; row < graph.GetLength(0); row++)
+                        {
+                            for (int col = 0; col < graph.GetLength(1); col++)
+                            {
+                                if (graph[row, col] != '.' && graph[row, col] != 'X' && graph[row, col] != '+')
+                                {
+                                    nodeNames[counter] = graph[row, col];
+                                    counter++;
+                                }
+                            }
+                        }
+                        Array.Sort(nodeNames);
+
                         if (flag)
                         {
                             // defining the r matricies
@@ -223,12 +250,11 @@ namespace ProjectGrapher
                             flag = false;
                         }
 
+                        //findRelation(graph);
 
                         // calculate r star
-                        rStarMatrix = new int[nodeCount,nodeCount];
+                        rStarMatrix = new int[nodeCount, nodeCount];
                         nthMatrix = new int[nodeCount, nodeCount];
-
-
 
                         for (int i = 0; i < rMatrix.GetLength(0); i++)
                         {
@@ -283,7 +309,6 @@ namespace ProjectGrapher
                         {
                             nthMatrixInput = Convert.ToInt32(Int32.Parse(ckiCalc.KeyChar.ToString()));
                         }
-
                     }
                 }
                 else if (option == (int)ConsoleKey.D3)
