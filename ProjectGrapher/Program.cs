@@ -199,56 +199,53 @@ namespace ProjectGrapher
                                     if (graph[indexY + yDiff, indexX + xDiff] == '.')
                                     {
                                         breakPointNeighbours = findNeighbours(indexY, indexX, graph);
-                                        prevX = indexY - yDiff;
-                                        prevY = indexX - xDiff;
+                                        prevY = indexY - yDiff;
+                                        prevX = indexX - xDiff;
                                         for (int l = 0; l < breakPointNeighbours.Length; l++)
                                         {
 
-                                            if (graph[prevX, prevY] != breakPointNeighbours[l])
+                                            if (graph[prevY, prevX] != breakPointNeighbours[l] && breakPointNeighbours[l] == '+')
                                             {
-                                                if (breakPointNeighbours[l] == '+')
+                                                if (l == 0)
                                                 {
-                                                    if (l == 0)
-                                                    {
-                                                        xDiff = -1;
-                                                        yDiff = -1;
-                                                    }
-                                                    else if (l == 1)
-                                                    {
-                                                        xDiff = 0;
-                                                        yDiff = -1;
-                                                    }
-                                                    else if (l == 2)
-                                                    {
-                                                        xDiff = 1;
-                                                        yDiff = -1;
-                                                    }
-                                                    else if (l == 3)
-                                                    {
-                                                        xDiff = -1;
-                                                        yDiff = 0;
-                                                    }
-                                                    else if (l == 4)
-                                                    {
-                                                        xDiff = 1;
-                                                        yDiff = 0;
-                                                    }
-                                                    else if (l == 5)
-                                                    {
-                                                        xDiff = -1;
-                                                        yDiff = 1;
-                                                    }
-                                                    else if (l == 6)
-                                                    {
-                                                        xDiff = 0;
-                                                        yDiff = 1;
-                                                    }
-                                                    else if (l == 7)
-                                                    {
-                                                        xDiff = 1;
-                                                        yDiff = 1;
-                                                    }
-                                                }   
+                                                    xDiff = -1;
+                                                    yDiff = -1;
+                                                }
+                                                else if (l == 1)
+                                                {
+                                                    xDiff = 0;
+                                                    yDiff = -1;
+                                                }
+                                                else if (l == 2)
+                                                {
+                                                    xDiff = 1;
+                                                    yDiff = -1;
+                                                }
+                                                else if (l == 3)
+                                                {
+                                                    xDiff = -1;
+                                                    yDiff = 0;
+                                                }
+                                                else if (l == 4)
+                                                {
+                                                    xDiff = 1;
+                                                    yDiff = 0;
+                                                }
+                                                else if (l == 5)
+                                                {
+                                                    xDiff = -1;
+                                                    yDiff = 1;
+                                                }
+                                                else if (l == 6)
+                                                {
+                                                    xDiff = 0;
+                                                    yDiff = 1;
+                                                }
+                                                else if (l == 7)
+                                                {
+                                                    xDiff = 1;
+                                                    yDiff = 1;
+                                                }
                                             }
                                         }
                                         
