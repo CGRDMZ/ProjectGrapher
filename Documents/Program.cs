@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
 
 namespace ProjectGrapher
 {
@@ -76,7 +75,7 @@ namespace ProjectGrapher
             return matrix3;
         }
 
-        private static char[] findNeighbours(int row, int col, char[,] graph, bool diagonal = true)
+        private static char[] findNeighbours(int row, int col, char[,] graph)
         {
             char[] neighbours = new char[8];
             // neighbours are added like that
@@ -89,33 +88,12 @@ namespace ProjectGrapher
             {
                 for (int l = -1; l < 2; l++)
                 {
-                    if (diagonal)
+                    if (!(k == 0 && l == 0) && row + k > 0 && row + k < graph.GetLength(0) && col + l > 0 && col + l < graph.GetLength(1))
                     {
-                        if (!(k == 0 && l == 0) && row + k > 0 && row + k < graph.GetLength(0) && col + l > 0 && col + l < graph.GetLength(1))
+                        neighbours[counter] = graph[row + k, col + l];
+                        if (counter < neighbours.Length - 1)
                         {
-                            neighbours[counter] = graph[row + k, col + l];
-                            if (counter < neighbours.Length - 1)
-                            {
-                                counter++;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (!(k == 0 && l == 0) && row + k > 0 && row + k < graph.GetLength(0) && col + l > 0 && col + l < graph.GetLength(1))
-                        {
-                            if ((k == -1 && l == -1) || (k == -1 && l == 1) || (k == 1 && l == -1) || (k == 1 && l == 1))
-                            {
-                                neighbours[counter] = '0';
-                            }
-                            else
-                            {
-                                neighbours[counter] = graph[row + k, col + l];
-                            }
-                            if (counter < neighbours.Length - 1)
-                            {
-                                counter++;
-                            }
+                            counter++;
                         }
                     }
                 }
@@ -139,37 +117,12 @@ namespace ProjectGrapher
             int i = 0;
             char node;
             char[] nodeNeighbours = new char[8];
-
-            char[] initialNeighbours = new char[8];
-
             char[] breakPointNeighbours = new char[8];
-
-            bool[,] isVisited = new bool[graph.GetLength(0), graph.GetLength(1)];
-            // filling matrix all not visited initially
-            for (int k = 0; k < isVisited.GetLength(0); k++)
-            {
-                for (int l = 0; l < isVisited.GetLength(1); l++)
-                {
-                    
-                    if (graph[k,l] == '.')
-                    {
-                        isVisited[k, l] = true;
-                    }
-                    else
-                    {
-                        isVisited[k, l] = false;
-                    }
-                }
-            }
 
             int indexX;
             int indexY;
 
-            int xDiff;
-            int yDiff;
-
-            bool trace;
-
+            bool trace = true;
 
             for (int row = 0; row < graph.GetLength(0); row++)
             {
@@ -179,188 +132,229 @@ namespace ProjectGrapher
                     {
                         node = nodeNames[i];
 
-
-                        initialNeighbours = findNeighbours(row, col, graph);
-
-                        int prevX;
-                        int prevY;
-
+                        nodeNeighbours = findNeighbours(row, col, graph);
                         indexX = col;
                         indexY = row;
 
-
-                        xDiff = 0;
-                        yDiff = 0;
-
-                        trace = true;
-
-                        for (int k = 0; k < nodeNeighbours.Length; k++)
-                        {
-                            prevX = xDiff;
-                            prevY = yDiff;
-                            if (nodeNeighbours[k] == '+')
-                            {
-                                if (k == 0)
-                                {
-                                    xDiff = -1;
-                                    yDiff = -1;
-                                }
-                                else if (k == 1)
-                                {
-                                    xDiff = 0;
-                                    yDiff = -1;
-                                }
-                                else if (k == 2)
-                                {
-                                    xDiff = 1;
-                                    yDiff = -1;
-                                }
-                                else if (k == 3)
-                                {
-                                    xDiff = -1;
-                                    yDiff = 0;
-                                }
-                                else if (k == 4)
-                                {
-                                    xDiff = 1;
-                                    yDiff = 0;
-                                }
-                                else if (k == 5)
-                                {
-                                    xDiff = -1;
-                                    yDiff = 1;
-                                }
-                                else if (k == 6)
-                                {
-                                    xDiff = 0;
-                                    yDiff = 1;
-                                }
-                                else if (k == 7)
-                                {
-                                    xDiff = 1;
-                                    yDiff = 1;
-                                }
-                                if (isVisited[indexY + yDiff, indexX + xDiff])
-                                {
-                                    xDiff = prevX;
-                                    yDiff = prevY;
-                                }
-                            }
-                        }
-
-
-
                         // tracing algorithm
                         // TODO: tracing algorithm works fine for direct lines, now it should detect breakpoints and change direction to find more complex relations
-                        for (int l = 0; l < initialNeighbours.Length; l++)
+                        for (int j = 0; j < nodeNeighbours.Length; j++)
                         {
-
                             indexX = col;
                             indexY = row;
-
-                            nodeNeighbours = findNeighbours(indexY, indexX, graph);
-
-                            while (trace)
+                            //trace = true;
+                            if (nodeNeighbours[j] == '+')
                             {
-                                int plusCounter = 0;
-                                if (graph[indexY + yDiff, indexX + xDiff] == '.' || graph[indexY, indexX] == 'X')
+                                if (j == 0)// going to north west
                                 {
-                                    nodeNeighbours = findNeighbours(indexY, indexX, graph);
-                                    // we can count number of +'s to give an error, if more than 2, than exception
+                                    while (graph[indexY - 1, indexX - 1] == '+')
+                                    {
+                                        indexX -= 1;
+                                        indexY -= 1;
+                                        drawText(indexX, indexY, "!");
+                                    }
+                                    if (graph[indexY - 1, indexX - 1] == 'X')
+                                    {
+                                        indexX -= 1;
+                                        indexY -= 1;
+                                        breakPointNeighbours = findNeighbours(indexY, indexX, graph);
+                                        for (int k = 0; k < breakPointNeighbours.Length; k++)
+                                        {
+                                            for (int l = 0; l < nodeNames.Length; l++)
+                                            {
+                                                if (breakPointNeighbours[k] == nodeNames[l])
+                                                {
+                                                    trace = false;
+                                                    rMatrix[i, l] = 1;
+                                                }
+                                            }
+                                        }
+                                    }
                                     
                                 }
-
-                                // if index is on a dot than there must be something wrong, so give an error message
-                                if (graph[indexY, indexX] == '.')
+                                else if (j == 1)
                                 {
-                                    Console.WriteLine("something went wrong!!!");
-                                }
-                                
-
-                                for (int k = 0; k < nodeNeighbours.Length; k++)
-                                {
-                                    for (int m = 0; m < nodeNames.Length; m++)
+                                    while (graph[indexY - 1, indexX] == '+')
                                     {
-                                        if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                        indexY -= 1;
+                                        drawText(indexX, indexY, "!");
+                                    }
+                                    if (graph[indexY - 1, indexX] == 'X')
+                                    {
+                                        indexY -= 1;
+                                        breakPointNeighbours = findNeighbours(indexY, indexX, graph);
+                                        for (int k = 0; k < breakPointNeighbours.Length; k++)
                                         {
-                                            rMatrix[i, m] = 1;
-                                            trace = false;
-                                            indexX = col;
-                                            indexY = row;
-                                            break;
+                                            for (int l = 0; l < nodeNames.Length; l++)
+                                            {
+                                                if (breakPointNeighbours[k] == nodeNames[l])
+                                                {
+                                                    trace = false;
+                                                    rMatrix[i, l] = 1;
+                                                }
+                                            }
                                         }
                                     }
+                                    
                                 }
-
-
-                                for (int k = 0; k < nodeNeighbours.Length; k++)
+                                else if (j == 2)
                                 {
-                                    prevX = xDiff;
-                                    prevY = yDiff;
-                                    if (nodeNeighbours[k] == '+')
+                                    while (graph[indexY - 1, indexX + 1] == '+')
                                     {
-                                        if (k == 0)
+                                        indexX += 1;
+                                        indexY -= 1;
+                                        drawText(indexX, indexY, "!");
+                                    }
+                                    if (graph[indexY - 1, indexX + 1] == 'X')
+                                    {
+                                        indexX += 1;
+                                        indexY -= 1;
+                                        breakPointNeighbours = findNeighbours(indexY, indexX, graph);
+                                        for (int k = 0; k < breakPointNeighbours.Length; k++)
                                         {
-                                            xDiff = -1;
-                                            yDiff = -1;
-                                        }
-                                        else if (k == 1)
-                                        {
-                                            xDiff = 0;
-                                            yDiff = -1;
-                                        }
-                                        else if (k == 2)
-                                        {
-                                            xDiff = 1;
-                                            yDiff = -1;
-                                        }
-                                        else if (k == 3)
-                                        {
-                                            xDiff = -1;
-                                            yDiff = 0;
-                                        }
-                                        else if (k == 4)
-                                        {
-                                            xDiff = 1;
-                                            yDiff = 0;
-                                        }
-                                        else if (k == 5)
-                                        {
-                                            xDiff = -1;
-                                            yDiff = 1;
-                                        }
-                                        else if (k == 6)
-                                        {
-                                            xDiff = 0;
-                                            yDiff = 1;
-                                        }
-                                        else if (k == 7)
-                                        {
-                                            xDiff = 1;
-                                            yDiff = 1;
-                                        }
-                                        if (isVisited[indexY + yDiff, indexX + xDiff])
-                                        {
-                                            xDiff = prevX;
-                                            yDiff = prevY;
+                                            for (int l = 0; l < nodeNames.Length; l++)
+                                            {
+                                                if (breakPointNeighbours[k] == nodeNames[l])
+                                                {
+                                                    trace = false;
+                                                    rMatrix[i, l] = 1;
+                                                }
+                                            }
                                         }
                                     }
+                                    
                                 }
-                                //Console.Clear();
-                                isVisited[indexY, indexX] = true;
-                                indexX += xDiff;
-                                indexY += yDiff;
-
-
-
-
-                                drawGraph(0, 0, graph);
-                                drawText(indexX, indexY, "!");
-
-                                Thread.Sleep(400);
+                                else if (j == 3)
+                                {
+                                    while (graph[indexY, indexX - 1] == '+')
+                                    {
+                                        indexX -= 1;
+                                        drawText(indexX, indexY, "!");
+                                    }
+                                    if (graph[indexY, indexX - 1] == 'X')
+                                    {
+                                        indexX -= 1;
+                                        breakPointNeighbours = findNeighbours(indexY, indexX, graph);
+                                        for (int k = 0; k < breakPointNeighbours.Length; k++)
+                                        {
+                                            for (int l = 0; l < nodeNames.Length; l++)
+                                            {
+                                                if (breakPointNeighbours[k] == nodeNames[l])
+                                                {
+                                                    trace = false;
+                                                    rMatrix[i, l] = 1;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                }
+                                else if (j == 4)
+                                {
+                                    while (graph[indexY, indexX + 1] == '+')
+                                    {
+                                        indexX += 1;
+                                        drawText(indexX, indexY, "!");
+                                    }
+                                    if (graph[indexY, indexX + 1] == 'X')
+                                    {
+                                        indexX += 1;
+                                        breakPointNeighbours = findNeighbours(indexY, indexX, graph);
+                                        for (int k = 0; k < breakPointNeighbours.Length; k++)
+                                        {
+                                            for (int l = 0; l < nodeNames.Length; l++)
+                                            {
+                                                if (breakPointNeighbours[k] == nodeNames[l])
+                                                {
+                                                    trace = false;
+                                                    rMatrix[i, l] = 1;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                }
+                                else if (j == 5)
+                                {
+                                    while (graph[indexY + 1, indexX - 1] == '+')
+                                    {
+                                        indexX -= 1;
+                                        indexY += 1;
+                                        drawText(indexX, indexY, "!");
+                                    }
+                                    if (graph[indexY + 1, indexX - 1] == 'X')
+                                    {
+                                        indexX -= 1;
+                                        indexY += 1;
+                                        breakPointNeighbours = findNeighbours(indexY, indexX, graph);
+                                        for (int k = 0; k < breakPointNeighbours.Length; k++)
+                                        {
+                                            for (int l = 0; l < nodeNames.Length; l++)
+                                            {
+                                                if (breakPointNeighbours[k] == nodeNames[l])
+                                                {
+                                                    trace = false;
+                                                    rMatrix[i, l] = 1;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                }
+                                else if (j == 6)
+                                {
+                                    while (graph[indexY + 1, indexX] == '+')
+                                    {
+                                        indexY += 1;
+                                        drawText(indexX, indexY, "!");
+                                    }
+                                    if (graph[indexY + 1, indexX] == 'X')
+                                    {
+                                        indexY += 1;
+                                        breakPointNeighbours = findNeighbours(indexY, indexX, graph);
+                                        for (int k = 0; k < breakPointNeighbours.Length; k++)
+                                        {
+                                            for (int l = 0; l < nodeNames.Length; l++)
+                                            {
+                                                if (breakPointNeighbours[k] == nodeNames[l])
+                                                {
+                                                    trace = false;
+                                                    rMatrix[i, l] = 1;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                }
+                                else if (j == 7)
+                                {
+                                    while (graph[indexY + 1, indexX + 1] == '+')
+                                    {
+                                        indexX += 1;
+                                        indexY += 1;
+                                        drawText(indexX, indexY, "!");
+                                    }
+                                    if (graph[indexY + 1, indexX + 1] == 'X')
+                                    {
+                                        indexX += 1;
+                                        indexY += 1;
+                                        breakPointNeighbours = findNeighbours(indexY, indexX, graph);
+                                        for (int k = 0; k < breakPointNeighbours.Length; k++)
+                                        {
+                                            for (int l = 0; l < nodeNames.Length; l++)
+                                            {
+                                                if (breakPointNeighbours[k] == nodeNames[l])
+                                                {
+                                                    trace = false;
+                                                    rMatrix[i, l] = 1;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                }
                             }
                         }
-                        
 
                         if (i < nodeNames.Length - 1)
                         {
@@ -498,7 +492,7 @@ namespace ProjectGrapher
                         {
                             for (int col = 0; col < graph.GetLength(1); col++)
                             {
-                                if (graph[row, col] != '.' && graph[row, col] != 'X' && graph[row, col] != '+' && graph[row, col] <= 'I' && graph[row, col] >= 'A')
+                                if (graph[row, col] != '.' && graph[row, col] != 'X' && graph[row, col] != '+' && graph[row, col] <= 'H' && graph[row, col] >= 'A')
                                 {
                                     nodeCount++;
                                 }
@@ -512,7 +506,7 @@ namespace ProjectGrapher
                         {
                             for (int col = 0; col < graph.GetLength(1); col++)
                             {
-                                if (graph[row, col] != '.' && graph[row, col] != 'X' && graph[row, col] != '+' && graph[row, col] <= 'I' && graph[row, col] >= 'A')
+                                if (graph[row, col] != '.' && graph[row, col] != 'X' && graph[row, col] != '+' && graph[row, col] <= 'H' && graph[row, col] >= 'A')
                                 {
                                     nodeNames[counter] = graph[row, col];
                                     counter++;
@@ -520,7 +514,6 @@ namespace ProjectGrapher
                             }
                         }
 
-                        // we will make a function to achieve this.
                         Array.Sort(nodeNames);
 
                         //if (flag)
@@ -538,8 +531,11 @@ namespace ProjectGrapher
                         //    flag = false;
                         //}
 
-                        rMatrix = findRelation(graph);
-                        flag = false;
+                        if (flag)
+                        {
+                            rMatrix = findRelation(graph);
+                            flag = false;
+                        }
 
                         // calculate r star
                         rStarMatrix = new int[nodeCount, nodeCount];
@@ -582,35 +578,11 @@ namespace ProjectGrapher
 
                         drawGraph(graphXOffset, graphYOffset, graph);
 
-                        for (int i = 0; i < nodeNames.Length; i++)
-                        {
-                            Console.SetCursorPosition(80 + i * 2, 5);
-                            Console.Write(nodeNames[i]);
-                        }
-
-                        for (int i = 0; i < nodeNames.Length; i++)
-                        {
-                            Console.SetCursorPosition(78, 6 + i);
-                            Console.Write(nodeNames[i]);
-                        }
-
-                        for (int i = 0; i < nodeNames.Length; i++)
-                        {
-                            Console.SetCursorPosition(80 + i * 2, 16);
-                            Console.Write(nodeNames[i]);
-                        }
-
-                        for (int i = 0; i < nodeNames.Length; i++)
-                        {
-                            Console.SetCursorPosition(78, 17 + i);
-                            Console.Write(nodeNames[i]);
-                        }
-
                         drawText(80, 4, $"r{nthMatrixInput} matrix is:");
-                        drawGraph(80, 6, nthMatrix, 1);
+                        drawGraph(80, 5, nthMatrix, 1);
 
                         drawText(80, 15, "r* matrix is:");
-                        drawGraph(80, 17, rStarMatrix, 1);
+                        drawGraph(80, 16, rStarMatrix, 1);
 
                         ckiCalc = Console.ReadKey(true);
 
@@ -620,7 +592,7 @@ namespace ProjectGrapher
                         }
                         else
                         {
-                            nthMatrixInput = Convert.ToInt32(int.Parse(ckiCalc.KeyChar.ToString()));
+                            nthMatrixInput = Convert.ToInt32(Int32.Parse(ckiCalc.KeyChar.ToString()));
                         }
                     }
                 }
