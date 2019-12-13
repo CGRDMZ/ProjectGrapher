@@ -76,7 +76,7 @@ namespace ProjectGrapher
             return matrix3;
         }
 
-        private static char[] findNeighbours(int row, int col, char[,] graph)
+        private static char[] findNeighbours(int row, int col, char[,] graph, bool diagonal = true)
         {
             char[] neighbours = new char[8];
             // neighbours are added like that
@@ -89,12 +89,33 @@ namespace ProjectGrapher
             {
                 for (int l = -1; l < 2; l++)
                 {
-                    if (!(k == 0 && l == 0) && row + k > 0 && row + k < graph.GetLength(0) && col + l > 0 && col + l < graph.GetLength(1))
+                    if (diagonal)
                     {
-                        neighbours[counter] = graph[row + k, col + l];
-                        if (counter < neighbours.Length - 1)
+                        if (!(k == 0 && l == 0) && row + k > 0 && row + k < graph.GetLength(0) && col + l > 0 && col + l < graph.GetLength(1))
                         {
-                            counter++;
+                            neighbours[counter] = graph[row + k, col + l];
+                            if (counter < neighbours.Length - 1)
+                            {
+                                counter++;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (!(k == 0 && l == 0) && row + k > 0 && row + k < graph.GetLength(0) && col + l > 0 && col + l < graph.GetLength(1))
+                        {
+                            if ((k == -1 && l == -1) || (k == -1 && l == 1) || (k == 1 && l == -1) || (k == 1 && l == 1))
+                            {
+                                neighbours[counter] = '0';
+                            }
+                            else
+                            {
+                                neighbours[counter] = graph[row + k, col + l];
+                            }
+                            if (counter < neighbours.Length - 1)
+                            {
+                                counter++;
+                            }
                         }
                     }
                 }
@@ -120,13 +141,29 @@ namespace ProjectGrapher
             char[] nodeNeighbours = new char[8];
             char[] breakPointNeighbours = new char[8];
 
+            bool[,] isVisited = new bool[graph.GetLength(0), graph.GetLength(1)];
+            // filling matrix all not visited initially
+            for (int k = 0; k < isVisited.GetLength(0); k++)
+            {
+                for (int l = 0; l < isVisited.GetLength(1); l++)
+                {
+                    
+                    if (graph[k,l] == '.')
+                    {
+                        isVisited[k, l] = true;
+                    }
+                    else
+                    {
+                        isVisited[k, l] = false;
+                    }
+                }
+            }
+
             int indexX;
             int indexY;
 
             int xDiff;
             int yDiff;
-
-            bool trace = true;
 
             for (int row = 0; row < graph.GetLength(0); row++)
             {
@@ -150,19 +187,20 @@ namespace ProjectGrapher
                         // tracing algorithm
                         // TODO: tracing algorithm works fine for direct lines, now it should detect breakpoints and change direction to find more complex relations
 
-
                         while (true)
                         {
-
-                            if (graph[indexY + yDiff, indexX + xDiff] == '.')
+                            
+                            if (graph[indexY + yDiff, indexX + xDiff] != '+')
                             {
                                 nodeNeighbours = findNeighbours(indexY, indexX, graph);
+                                // we can count number of +'s to give an error, if more than 2, than exception
                             }
-
 
                             for (int k = 0; k < nodeNeighbours.Length; k++)
                             {
-                                if (nodeNeighbours[k] == '+'/* && graph[indexY - yDiff, indexX - xDiff] == '+'*/)
+                                prevX = xDiff;
+                                prevY = yDiff;
+                                if (nodeNeighbours[k] == '+')
                                 {
                                     if (k == 0)
                                     {
@@ -204,16 +242,22 @@ namespace ProjectGrapher
                                         xDiff = 1;
                                         yDiff = 1;
                                     }
-
+                                    if (isVisited[indexY + yDiff, indexX + xDiff])
+                                    {
+                                        xDiff = prevX;
+                                        yDiff = prevY;
+                                    }
                                 }
                             }
                             Console.Clear();
+                            isVisited[indexY, indexX] = true;
                             indexX += xDiff;
                             indexY += yDiff;
+
+                            drawGraph(0, 0, graph);
                             drawText(indexX, indexY, "!");
-                            Thread.Sleep(200);
+                            Thread.Sleep(400);
                         }
-                        
 
                         if (i < nodeNames.Length - 1)
                         {
