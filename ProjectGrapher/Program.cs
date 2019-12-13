@@ -165,6 +165,9 @@ namespace ProjectGrapher
             int xDiff;
             int yDiff;
 
+            bool trace;
+
+
             for (int row = 0; row < graph.GetLength(0); row++)
             {
                 for (int col = 0; col < graph.GetLength(1); col++)
@@ -184,16 +187,28 @@ namespace ProjectGrapher
                         xDiff = 0;
                         yDiff = 0;
 
+                        trace = true;
+
                         // tracing algorithm
                         // TODO: tracing algorithm works fine for direct lines, now it should detect breakpoints and change direction to find more complex relations
 
-                        while (true)
+                        while (trace)
                         {
                             
                             if (graph[indexY + yDiff, indexX + xDiff] != '+')
                             {
                                 nodeNeighbours = findNeighbours(indexY, indexX, graph);
                                 // we can count number of +'s to give an error, if more than 2, than exception
+                            }
+
+                            for (int k = 0; k < nodeNeighbours.Length; k++)
+                            {
+                                if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A')
+                                {
+                                    rMatrix[i, k] = 1;
+                                    trace = false;
+                                    break;
+                                }
                             }
 
                             for (int k = 0; k < nodeNeighbours.Length; k++)
@@ -249,14 +264,14 @@ namespace ProjectGrapher
                                     }
                                 }
                             }
-                            Console.Clear();
+                            //Console.Clear();
                             isVisited[indexY, indexX] = true;
                             indexX += xDiff;
                             indexY += yDiff;
 
-                            drawGraph(0, 0, graph);
-                            drawText(indexX, indexY, "!");
-                            Thread.Sleep(400);
+                            //drawGraph(0, 0, graph);
+                            //drawText(indexX, indexY, "!");
+                            //Thread.Sleep(400);
                         }
 
                         if (i < nodeNames.Length - 1)
