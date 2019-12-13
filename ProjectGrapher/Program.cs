@@ -150,115 +150,70 @@ namespace ProjectGrapher
                         // tracing algorithm
                         // TODO: tracing algorithm works fine for direct lines, now it should detect breakpoints and change direction to find more complex relations
 
-                        for (int k = 0; k < nodeNeighbours.Length; k++)
-                        {
-                            if (nodeNeighbours[k] == '+')
-                            {
-                                if (k == 0)
-                                {
-                                    xDiff = -1;
-                                    yDiff = -1;
-                                }
-                                else if (k == 1)
-                                {
-                                    xDiff = 0;
-                                    yDiff = -1;
-                                }
-                                else if (k == 2)
-                                {
-                                    xDiff = 1;
-                                    yDiff = -1;
-                                }
-                                else if (k == 3)
-                                {
-                                    xDiff = -1;
-                                    yDiff = 0;
-                                }
-                                else if (k == 4)
-                                {
-                                    xDiff = 1;
-                                    yDiff = 0;
-                                }
-                                else if (k == 5)
-                                {
-                                    xDiff = -1;
-                                    yDiff = 1;
-                                }
-                                else if (k == 6)
-                                {
-                                    xDiff = 0;
-                                    yDiff = 1;
-                                }
-                                else if (k == 7)
-                                {
-                                    xDiff = 1;
-                                    yDiff = 1;
-                                }
-                                while (true)
-                                {
-                                    if (graph[indexY + yDiff, indexX + xDiff] == '.')
-                                    {
-                                        breakPointNeighbours = findNeighbours(indexY, indexX, graph);
-                                        prevY = indexY - yDiff;
-                                        prevX = indexX - xDiff;
-                                        for (int l = 0; l < breakPointNeighbours.Length; l++)
-                                        {
 
-                                            if (graph[prevY, prevX] != breakPointNeighbours[l] && breakPointNeighbours[l] == '+')
-                                            {
-                                                if (l == 0)
-                                                {
-                                                    xDiff = -1;
-                                                    yDiff = -1;
-                                                }
-                                                else if (l == 1)
-                                                {
-                                                    xDiff = 0;
-                                                    yDiff = -1;
-                                                }
-                                                else if (l == 2)
-                                                {
-                                                    xDiff = 1;
-                                                    yDiff = -1;
-                                                }
-                                                else if (l == 3)
-                                                {
-                                                    xDiff = -1;
-                                                    yDiff = 0;
-                                                }
-                                                else if (l == 4)
-                                                {
-                                                    xDiff = 1;
-                                                    yDiff = 0;
-                                                }
-                                                else if (l == 5)
-                                                {
-                                                    xDiff = -1;
-                                                    yDiff = 1;
-                                                }
-                                                else if (l == 6)
-                                                {
-                                                    xDiff = 0;
-                                                    yDiff = 1;
-                                                }
-                                                else if (l == 7)
-                                                {
-                                                    xDiff = 1;
-                                                    yDiff = 1;
-                                                }
-                                            }
-                                        }
-                                        
+                        while (true)
+                        {
+
+                            if (graph[indexY + yDiff, indexX + xDiff] == '.')
+                            {
+                                nodeNeighbours = findNeighbours(indexY, indexX, graph);
+                            }
+
+
+                            for (int k = 0; k < nodeNeighbours.Length; k++)
+                            {
+                                if (nodeNeighbours[k] == '+'/* && graph[indexY - yDiff, indexX - xDiff] == '+'*/)
+                                {
+                                    if (k == 0)
+                                    {
+                                        xDiff = -1;
+                                        yDiff = -1;
+                                    }
+                                    else if (k == 1)
+                                    {
+                                        xDiff = 0;
+                                        yDiff = -1;
+                                    }
+                                    else if (k == 2)
+                                    {
+                                        xDiff = 1;
+                                        yDiff = -1;
+                                    }
+                                    else if (k == 3)
+                                    {
+                                        xDiff = -1;
+                                        yDiff = 0;
+                                    }
+                                    else if (k == 4)
+                                    {
+                                        xDiff = 1;
+                                        yDiff = 0;
+                                    }
+                                    else if (k == 5)
+                                    {
+                                        xDiff = -1;
+                                        yDiff = 1;
+                                    }
+                                    else if (k == 6)
+                                    {
+                                        xDiff = 0;
+                                        yDiff = 1;
+                                    }
+                                    else if (k == 7)
+                                    {
+                                        xDiff = 1;
+                                        yDiff = 1;
                                     }
 
-                                    indexX += xDiff;
-                                    indexY += yDiff;
-
-                                    drawText(indexX, indexY, "!");
-                                    Thread.Sleep(300);
                                 }
                             }
+                            Console.Clear();
+                            indexX += xDiff;
+                            indexY += yDiff;
+                            drawText(indexX, indexY, "!");
+                            Thread.Sleep(200);
                         }
+                        
 
                         if (i < nodeNames.Length - 1)
                         {
