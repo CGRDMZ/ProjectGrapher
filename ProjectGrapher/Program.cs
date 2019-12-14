@@ -8,7 +8,7 @@ namespace ProjectGrapher
     {
         public const int graphWidth = 40;
         public const int graphHeight = 25;
-
+        private const int MillisecondsTimeout = 200;
         public static int nodeCount = 0;
         public static char[] nodeNames = new char[1];
 
@@ -75,6 +75,13 @@ namespace ProjectGrapher
             }
             return matrix3;
         }
+
+        private static void checkNeighbours()
+        {
+
+
+        }
+
 
         private static char[] findNeighbours(int row, int col, char[,] graph, bool diagonal = true)
         {
@@ -170,6 +177,8 @@ namespace ProjectGrapher
 
             bool trace;
 
+            bool found;
+
 
             for (int row = 0; row < graph.GetLength(0); row++)
             {
@@ -177,276 +186,330 @@ namespace ProjectGrapher
                 {
                     if (graph[row, col] == nodeNames[i])
                     {
-                        node = nodeNames[i];
-
+                        
 
                         initialNeighbours = findNeighbours(row, col, graph);
 
-                        int prevX;
-                        int prevY;
-
-                        indexX = col;
-                        indexY = row;
-
-
-                        xDiff = 0;
-                        yDiff = 0;
-
                         trace = true;
 
-                        for (int k = 0; k < initialNeighbours.Length; k++)
+                        for (int j = 0; j < initialNeighbours.Length; j++)
                         {
-                            prevX = xDiff;
-                            prevY = yDiff;
-                            if (initialNeighbours[k] == '+' && !isVisited[row + yDiff, col + xDiff])
-                            {
-                                if (k == 0)
-                                {
-                                    xDiff = -1;
-                                    yDiff = -1;
-                                }
-                                else if (k == 1)
-                                {
-                                    xDiff = 0;
-                                    yDiff = -1;
-                                }
-                                else if (k == 2)
-                                {
-                                    xDiff = 1;
-                                    yDiff = -1;
-                                }
-                                else if (k == 3)
-                                {
-                                    xDiff = -1;
-                                    yDiff = 0;
-                                }
-                                else if (k == 4)
-                                {
-                                    xDiff = 1;
-                                    yDiff = 0;
-                                }
-                                else if (k == 5)
-                                {
-                                    xDiff = -1;
-                                    yDiff = 1;
-                                }
-                                else if (k == 6)
-                                {
-                                    xDiff = 0;
-                                    yDiff = 1;
-                                }
-                                else if (k == 7)
-                                {
-                                    xDiff = 1;
-                                    yDiff = 1;
-                                }
-                                if (isVisited[indexY + yDiff, indexX + xDiff])
-                                {
-                                    xDiff = prevX;
-                                    yDiff = prevY;
-                                }
-                            }
-                        }
-
-
-
-                        // tracing algorithm
-                        // TODO: tracing algorithm works fine for direct lines, now it should detect breakpoints and change direction to find more complex relations
-                        for (int l = 0; l < initialNeighbours.Length; l++)
-                        {
-
+                            
                             indexX = col;
                             indexY = row;
 
-                            nodeNeighbours = findNeighbours(indexY, indexX, graph);
-
-
-                            for (int k = 0; k < nodeNeighbours.Length; k++)
-                            {
-                                prevX = xDiff;
-                                prevY = yDiff;
-                                if (nodeNeighbours[k] == '+')
-                                {
-                                    if (k == 0)
-                                    {
-                                        xDiff = -1;
-                                        yDiff = -1;
-                                    }
-                                    else if (k == 1)
-                                    {
-                                        xDiff = 0;
-                                        yDiff = -1;
-                                    }
-                                    else if (k == 2)
-                                    {
-                                        xDiff = 1;
-                                        yDiff = -1;
-                                    }
-                                    else if (k == 3)
-                                    {
-                                        xDiff = -1;
-                                        yDiff = 0;
-                                    }
-                                    else if (k == 4)
-                                    {
-                                        xDiff = 1;
-                                        yDiff = 0;
-                                    }
-                                    else if (k == 5)
-                                    {
-                                        xDiff = -1;
-                                        yDiff = 1;
-                                    }
-                                    else if (k == 6)
-                                    {
-                                        xDiff = 0;
-                                        yDiff = 1;
-                                    }
-                                    else if (k == 7)
-                                    {
-                                        xDiff = 1;
-                                        yDiff = 1;
-                                    }
-                                    if (isVisited[indexY + yDiff, indexX + xDiff])
-                                    {
-                                        xDiff = prevX;
-                                        yDiff = prevY;
-                                    }
-                                }
-                            }
-
+                            found = false;
 
                             while (trace)
                             {
 
-
-
-
-
-
-                                
-                                if (graph[indexY + yDiff, indexX + xDiff] == '.' || graph[indexY, indexX] == 'X')
+                                if (!isVisited[indexY, indexX + 1])
                                 {
-                                    nodeNeighbours = findNeighbours(indexY, indexX, graph);
-                                    // we can count number of +'s to give an error, if more than 2, than exception
-                                    int plusCounter = 0;
-                                    for (int j = 0; j < nodeNeighbours.Length; j++)
+                                    while (graph[indexY, indexX + 1] == '+') // going right
                                     {
-                                        if (nodeNeighbours[j] == '+')
+                                        indexX += 1;
+                                        isVisited[indexY, indexX] = true;
+                                        drawGraph(0, 0, graph);
+                                        drawGraph(80, 6, rMatrix, 1);
+                                        drawText(indexX, indexY, "!");
+                                        Thread.Sleep(MillisecondsTimeout);
+                                        if (graph[indexY, indexX + 1] == 'X')
                                         {
-                                            plusCounter++;
+                                            indexX += 1;
+                                            found = true;
                                         }
-                                    }
-
-                                    if (plusCounter > 2)
-                                    {
-                                        break;
-                                    }
-
-                                    for (int k = 0; k < nodeNeighbours.Length; k++)
-                                    {
-                                        prevX = xDiff;
-                                        prevY = yDiff;
-                                        if (nodeNeighbours[k] == '+')
+                                        if (found)
                                         {
-                                            if (k == 0)
-                                            {
-                                                xDiff = -1;
-                                                yDiff = -1;
-                                            }
-                                            else if (k == 1)
-                                            {
-                                                xDiff = 0;
-                                                yDiff = -1;
-                                            }
-                                            else if (k == 2)
-                                            {
-                                                xDiff = 1;
-                                                yDiff = -1;
-                                            }
-                                            else if (k == 3)
-                                            {
-                                                xDiff = -1;
-                                                yDiff = 0;
-                                            }
-                                            else if (k == 4)
-                                            {
-                                                xDiff = 1;
-                                                yDiff = 0;
-                                            }
-                                            else if (k == 5)
-                                            {
-                                                xDiff = -1;
-                                                yDiff = 1;
-                                            }
-                                            else if (k == 6)
-                                            {
-                                                xDiff = 0;
-                                                yDiff = 1;
-                                            }
-                                            else if (k == 7)
-                                            {
-                                                xDiff = 1;
-                                                yDiff = 1;
-                                            }
-                                            if (isVisited[indexY + yDiff, indexX + xDiff])
-                                            {
-                                                xDiff = prevX;
-                                                yDiff = prevY;
-                                            }
-                                        }
-                                    }
-                                }
+                                            nodeNeighbours = findNeighbours(indexY, indexX, graph);
 
-
-                                
-
-
-
-
-                                // if index is on a dot than there must be something wrong, so give an error message
-                                if (graph[indexY, indexX] == '.')
-                                {
-                                    Console.WriteLine("something went wrong!!!");
-                                    break;
-                                }
-                                
-
-                                // add to r matrix
-                                for (int k = 0; k < nodeNeighbours.Length; k++)
-                                {
-                                    for (int m = 0; m < nodeNames.Length; m++)
-                                    {
-                                        if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
-                                        {
-                                            rMatrix[i, m] = 1;
-                                            trace = false;
-                                            indexX = col;
-                                            indexY = row;
-
-                                            xDiff = 0;
-                                            yDiff = 0;
-
+                                            // add to r matrix
+                                            for (int k = 0; k < nodeNeighbours.Length; k++)
+                                            {
+                                                for (int m = 0; m < nodeNames.Length; m++)
+                                                {
+                                                    if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                                    {
+                                                        rMatrix[i, m] = 1;
+                                                        indexX -= 1;
+                                                        trace = false;
+                                                        break;
+                                                    }
+                                                }
+                                            }
                                             break;
                                         }
                                     }
                                 }
+                                
+                                while (graph[indexY - 1, indexX] == '+' && !isVisited[indexY - 1, indexX]) // going up
+                                {
+                                    indexY -= 1;
+                                    isVisited[indexY, indexX] = true;
+                                    drawGraph(0, 0, graph);
+                                    drawGraph(80, 6, rMatrix, 1);
+                                    drawText(indexX, indexY, "!");
+                                    Thread.Sleep(MillisecondsTimeout);
+                                    if (graph[indexY - 1, indexX] == 'X')
+                                    {
+                                        indexY -= 1;
+                                        found = true;
+                                    }
+                                    if (found)
+                                    {
+                                        nodeNeighbours = findNeighbours(indexY, indexX, graph);
+
+                                        // add to r matrix
+                                        for (int k = 0; k < nodeNeighbours.Length; k++)
+                                        {
+                                            for (int m = 0; m < nodeNames.Length; m++)
+                                            {
+                                                if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                                {
+                                                    rMatrix[i, m] = 1;
+                                                    indexY += 1;
+                                                    trace = false;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    }
+                                }
+                                while(graph[indexY, indexX - 1] == '+' && !isVisited[indexY, indexX - 1]) // going left
+                                {
+                                    indexX -= 1;
+                                    isVisited[indexY, indexX] = true;
+                                    drawGraph(0, 0, graph);
+                                    drawGraph(80, 6, rMatrix, 1);
+                                    drawText(indexX, indexY, "!");
+                                    Thread.Sleep(MillisecondsTimeout);
+                                    if (graph[indexY, indexX - 1] == 'X')
+                                    {
+                                        indexX -= 1;
+                                        found = true;
+                                    }
+                                    if (found)
+                                    {
+                                        nodeNeighbours = findNeighbours(indexY, indexX, graph);
+
+                                        // add to r matrix
+                                        for (int k = 0; k < nodeNeighbours.Length; k++)
+                                        {
+                                            for (int m = 0; m < nodeNames.Length; m++)
+                                            {
+                                                if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                                {
+                                                    rMatrix[i, m] = 1;
+                                                    indexX += 1;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        trace = false;
+                                        break;
+                                    }
+                                }
+                                while(graph[indexY + 1, indexX] == '+' && !isVisited[indexY + 1, indexX]) // going down
+                                {
+                                    indexY += 1;
+                                    isVisited[indexY, indexX] = true;
+                                    drawGraph(0, 0, graph);
+                                    drawGraph(80, 6, rMatrix, 1);
+                                    drawText(indexX, indexY, "!");
+                                    Thread.Sleep(MillisecondsTimeout);
+                                    if (graph[indexY + 1, indexX] == 'X')
+                                    {
+                                        indexY += 1;
+                                        found = true;
+                                    }
+                                    if (found)
+                                    {
+                                        nodeNeighbours = findNeighbours(indexY, indexX, graph);
+
+                                        // add to r matrix
+                                        for (int k = 0; k < nodeNeighbours.Length; k++)
+                                        {
+                                            for (int m = 0; m < nodeNames.Length; m++)
+                                            {
+                                                if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                                {
+                                                    rMatrix[i, m] = 1;
+                                                    indexY -= 1;
+                                                    trace = false;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    }
+                                }
+                                while (graph[indexY - 1, indexX + 1] == '+' && !isVisited[indexY - 1, indexX + 1]) // going north east
+                                {
+                                    indexY -= 1;
+                                    indexX += 1;
+                                    isVisited[indexY, indexX] = true;
+                                    drawGraph(0, 0, graph);
+                                    drawGraph(80, 6, rMatrix, 1);
+                                    drawText(indexX, indexY, "!");
+                                    Thread.Sleep(MillisecondsTimeout);
+                                    if (graph[indexY - 1, indexX + 1] == 'X')
+                                    {
+                                        indexY -= 1;
+                                        indexX += 1;
+                                        found = true;
+                                    }
+                                    if (found)
+                                    {
+                                        nodeNeighbours = findNeighbours(indexY, indexX, graph);
+
+                                        // add to r matrix
+                                        for (int k = 0; k < nodeNeighbours.Length; k++)
+                                        {
+                                            for (int m = 0; m < nodeNames.Length; m++)
+                                            {
+                                                if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                                {
+                                                    rMatrix[i, m] = 1;
+                                                    indexY += 1;
+                                                    indexX -= 1;
+                                                    trace = false;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    }
+                                }
+                                while (graph[indexY - 1, indexX - 1] == '+' && !isVisited[indexY - 1, indexX - 1]) // going north west
+                                {
+                                    indexY -= 1;
+                                    indexX -= 1;
+                                    isVisited[indexY, indexX] = true;
+                                    drawGraph(0, 0, graph);
+                                    drawGraph(80, 6, rMatrix, 1);
+                                    drawText(indexX, indexY, "!");
+                                    Thread.Sleep(MillisecondsTimeout);
+                                    if (graph[indexY - 1, indexX - 1] == 'X')
+                                    {
+                                        indexY -= 1;
+                                        indexX -= 1;
+                                        found = true;
+                                    }
+                                    if (found)
+                                    {
+                                        nodeNeighbours = findNeighbours(indexY, indexX, graph);
+
+                                        // add to r matrix
+                                        for (int k = 0; k < nodeNeighbours.Length; k++)
+                                        {
+                                            for (int m = 0; m < nodeNames.Length; m++)
+                                            {
+                                                if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                                {
+                                                    rMatrix[i, m] = 1;
+                                                    indexY += 1;
+                                                    indexX += 1;
+                                                    trace = false;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    }
+                                }
+                                while (graph[indexY + 1, indexX + 1] == '+' && !isVisited[indexY + 1, indexX + 1]) // going south east
+                                {
+                                    indexY += 1;
+                                    indexX += 1;
+                                    isVisited[indexY, indexX] = true;
+                                    drawGraph(0, 0, graph);
+                                    drawGraph(80, 6, rMatrix, 1);
+                                    drawText(indexX, indexY, "!");
+                                    Thread.Sleep(MillisecondsTimeout);
+                                    if (graph[indexY + 1, indexX + 1] == 'X')
+                                    {
+                                        indexY += 1;
+                                        indexX += 1;
+                                        found = true;
+                                    }
+                                    if (found)
+                                    {
+                                        nodeNeighbours = findNeighbours(indexY, indexX, graph);
+
+                                        // add to r matrix
+                                        for (int k = 0; k < nodeNeighbours.Length; k++)
+                                        {
+                                            for (int m = 0; m < nodeNames.Length; m++)
+                                            {
+                                                if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                                {
+                                                    rMatrix[i, m] = 1;
+                                                    indexY -= 1;
+                                                    indexX -= 1;
+                                                    trace = false;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    }
+                                }
+                                while (graph[indexY + 1, indexX - 1] == '+' && !isVisited[indexY + 1, indexX - 1] && graph[indexY, indexX - 1] != 'X') // going north west
+                                {
+                                    indexY += 1;
+                                    indexX -= 1;
+                                    isVisited[indexY, indexX] = true;
+                                    drawGraph(0, 0, graph);
+                                    drawGraph(80, 6, rMatrix, 1);
+                                    drawText(indexX, indexY, "!");
+                                    Thread.Sleep(MillisecondsTimeout);
+                                    if (graph[indexY + 1, indexX - 1] == 'X')
+                                    {
+                                        indexY += 1;
+                                        indexX -= 1;
+                                        found = true;
+                                    }
+                                    if (found)
+                                    {
+                                        nodeNeighbours = findNeighbours(indexY, indexX, graph);
+
+                                        // add to r matrix
+                                        for (int k = 0; k < nodeNeighbours.Length; k++)
+                                        {
+                                            for (int m = 0; m < nodeNames.Length; m++)
+                                            {
+                                                if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                                {
+                                                    rMatrix[i, m] = 1;
+                                                    indexY -= 1;
+                                                    indexX += 1;
+                                                    trace = false;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    }
+                                }
+
 
 
                                 
-                                //Console.Clear();
+                                
+                                
+                                
+                                
+
+                                
+
                                 isVisited[indexY, indexX] = true;
-                                indexX += xDiff;
-                                indexY += yDiff;
-
-
-
 
                                 drawGraph(0, 0, graph);
                                 drawText(indexX, indexY, "!");
 
-                                Thread.Sleep(400);
+                                Thread.Sleep(MillisecondsTimeout);
                             }
+                            
                         }
                         
 
