@@ -194,11 +194,11 @@ namespace ProjectGrapher
 
                         trace = true;
 
-                        for (int k = 0; k < nodeNeighbours.Length; k++)
+                        for (int k = 0; k < initialNeighbours.Length; k++)
                         {
                             prevX = xDiff;
                             prevY = yDiff;
-                            if (nodeNeighbours[k] == '+')
+                            if (initialNeighbours[k] == '+' && !isVisited[row + yDiff, col + xDiff])
                             {
                                 if (k == 0)
                                 {
@@ -260,23 +260,159 @@ namespace ProjectGrapher
 
                             nodeNeighbours = findNeighbours(indexY, indexX, graph);
 
+
+                            for (int k = 0; k < nodeNeighbours.Length; k++)
+                            {
+                                prevX = xDiff;
+                                prevY = yDiff;
+                                if (nodeNeighbours[k] == '+')
+                                {
+                                    if (k == 0)
+                                    {
+                                        xDiff = -1;
+                                        yDiff = -1;
+                                    }
+                                    else if (k == 1)
+                                    {
+                                        xDiff = 0;
+                                        yDiff = -1;
+                                    }
+                                    else if (k == 2)
+                                    {
+                                        xDiff = 1;
+                                        yDiff = -1;
+                                    }
+                                    else if (k == 3)
+                                    {
+                                        xDiff = -1;
+                                        yDiff = 0;
+                                    }
+                                    else if (k == 4)
+                                    {
+                                        xDiff = 1;
+                                        yDiff = 0;
+                                    }
+                                    else if (k == 5)
+                                    {
+                                        xDiff = -1;
+                                        yDiff = 1;
+                                    }
+                                    else if (k == 6)
+                                    {
+                                        xDiff = 0;
+                                        yDiff = 1;
+                                    }
+                                    else if (k == 7)
+                                    {
+                                        xDiff = 1;
+                                        yDiff = 1;
+                                    }
+                                    if (isVisited[indexY + yDiff, indexX + xDiff])
+                                    {
+                                        xDiff = prevX;
+                                        yDiff = prevY;
+                                    }
+                                }
+                            }
+
+
                             while (trace)
                             {
-                                int plusCounter = 0;
+
+
+
+
+
+
+                                
                                 if (graph[indexY + yDiff, indexX + xDiff] == '.' || graph[indexY, indexX] == 'X')
                                 {
                                     nodeNeighbours = findNeighbours(indexY, indexX, graph);
                                     // we can count number of +'s to give an error, if more than 2, than exception
-                                    
+                                    int plusCounter = 0;
+                                    for (int j = 0; j < nodeNeighbours.Length; j++)
+                                    {
+                                        if (nodeNeighbours[j] == '+')
+                                        {
+                                            plusCounter++;
+                                        }
+                                    }
+
+                                    if (plusCounter > 2)
+                                    {
+                                        break;
+                                    }
+
+                                    for (int k = 0; k < nodeNeighbours.Length; k++)
+                                    {
+                                        prevX = xDiff;
+                                        prevY = yDiff;
+                                        if (nodeNeighbours[k] == '+')
+                                        {
+                                            if (k == 0)
+                                            {
+                                                xDiff = -1;
+                                                yDiff = -1;
+                                            }
+                                            else if (k == 1)
+                                            {
+                                                xDiff = 0;
+                                                yDiff = -1;
+                                            }
+                                            else if (k == 2)
+                                            {
+                                                xDiff = 1;
+                                                yDiff = -1;
+                                            }
+                                            else if (k == 3)
+                                            {
+                                                xDiff = -1;
+                                                yDiff = 0;
+                                            }
+                                            else if (k == 4)
+                                            {
+                                                xDiff = 1;
+                                                yDiff = 0;
+                                            }
+                                            else if (k == 5)
+                                            {
+                                                xDiff = -1;
+                                                yDiff = 1;
+                                            }
+                                            else if (k == 6)
+                                            {
+                                                xDiff = 0;
+                                                yDiff = 1;
+                                            }
+                                            else if (k == 7)
+                                            {
+                                                xDiff = 1;
+                                                yDiff = 1;
+                                            }
+                                            if (isVisited[indexY + yDiff, indexX + xDiff])
+                                            {
+                                                xDiff = prevX;
+                                                yDiff = prevY;
+                                            }
+                                        }
+                                    }
                                 }
+
+
+                                
+
+
+
 
                                 // if index is on a dot than there must be something wrong, so give an error message
                                 if (graph[indexY, indexX] == '.')
                                 {
                                     Console.WriteLine("something went wrong!!!");
+                                    break;
                                 }
                                 
 
+                                // add to r matrix
                                 for (int k = 0; k < nodeNeighbours.Length; k++)
                                 {
                                     for (int m = 0; m < nodeNames.Length; m++)
@@ -287,65 +423,17 @@ namespace ProjectGrapher
                                             trace = false;
                                             indexX = col;
                                             indexY = row;
+
+                                            xDiff = 0;
+                                            yDiff = 0;
+
                                             break;
                                         }
                                     }
                                 }
 
 
-                                for (int k = 0; k < nodeNeighbours.Length; k++)
-                                {
-                                    prevX = xDiff;
-                                    prevY = yDiff;
-                                    if (nodeNeighbours[k] == '+')
-                                    {
-                                        if (k == 0)
-                                        {
-                                            xDiff = -1;
-                                            yDiff = -1;
-                                        }
-                                        else if (k == 1)
-                                        {
-                                            xDiff = 0;
-                                            yDiff = -1;
-                                        }
-                                        else if (k == 2)
-                                        {
-                                            xDiff = 1;
-                                            yDiff = -1;
-                                        }
-                                        else if (k == 3)
-                                        {
-                                            xDiff = -1;
-                                            yDiff = 0;
-                                        }
-                                        else if (k == 4)
-                                        {
-                                            xDiff = 1;
-                                            yDiff = 0;
-                                        }
-                                        else if (k == 5)
-                                        {
-                                            xDiff = -1;
-                                            yDiff = 1;
-                                        }
-                                        else if (k == 6)
-                                        {
-                                            xDiff = 0;
-                                            yDiff = 1;
-                                        }
-                                        else if (k == 7)
-                                        {
-                                            xDiff = 1;
-                                            yDiff = 1;
-                                        }
-                                        if (isVisited[indexY + yDiff, indexX + xDiff])
-                                        {
-                                            xDiff = prevX;
-                                            yDiff = prevY;
-                                        }
-                                    }
-                                }
+                                
                                 //Console.Clear();
                                 isVisited[indexY, indexX] = true;
                                 indexX += xDiff;
