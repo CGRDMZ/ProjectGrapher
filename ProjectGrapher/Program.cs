@@ -8,11 +8,59 @@ namespace ProjectGrapher
     {
         public const int graphWidth = 40;
         public const int graphHeight = 25;
-        private const int MillisecondsTimeout = 0;
+        public static int graphX = 2;
+        public static int graphY = 2;
+        private const int MillisecondsTimeout = 100;
         public static int nodeCount = 0;
         public static char[] nodeNames = new char[1];
-
         public static int[,] rMatrix = new int[1, 1];
+
+        private static void design(int graphHeight, int graphWidth)
+        {
+            int num = 0;
+            for (int k = 0; k < graphHeight; k++)
+            {
+                Console.SetCursorPosition(0, 2 + k);
+                Console.Write(num);
+                num++;
+                if (num == 10)
+                    num = 0;
+            }            
+            num = 0;
+            for (int l = 0; l < graphWidth; l++)
+            {
+                Console.SetCursorPosition(2 + l, 0);
+                Console.Write(num);
+                num++;
+                if (num == 10)
+                {
+                    num = 0;
+                }
+                
+            }
+            for (int i = 0; i < graphHeight; i++)
+            {
+                Console.SetCursorPosition(1, 2 + i);
+                Console.Write("#");
+            }
+            for (int i = 0; i < graphHeight; i++)
+            {
+                Console.SetCursorPosition(42, 2 + i);
+                Console.Write("#");
+            }
+            for (int m = 0; m < graphWidth+2; m++)
+            {
+                Console.SetCursorPosition(1 + m, 1);
+                Console.Write("#");
+            }
+            for (int m = 0; m < graphWidth+2; m++)
+            {
+                Console.SetCursorPosition(1 + m, 27);
+                Console.Write("#");
+            }
+
+
+        }
 
         private static void drawGraph(int x, int y, dynamic array, int emptySpace = 0)
         {
@@ -76,9 +124,6 @@ namespace ProjectGrapher
             return matrix3;
         }
 
-        private static void checkNeighbours()
-        {
-        }
 
         private static char[] findNeighbours(int row, int col, char[,] graph, bool diagonal = true)
         {
@@ -203,12 +248,12 @@ namespace ProjectGrapher
                             }
 
 
-                            
+
 
                             while (trace)
                             {
 
-                                
+
 
                                 found = false;
 
@@ -259,9 +304,9 @@ namespace ProjectGrapher
                                     found = true;
                                 }
 
-                                drawGraph(0, 0, graph);
+                                drawGraph(graphX, graphY, graph);
                                 drawGraph(80, 6, rMatrix, 1);
-                                drawText(indexX, indexY, "!");
+                                drawText(indexX + 2, indexY + 2, "!");
                                 Thread.Sleep(MillisecondsTimeout);
 
                                 if (found)
@@ -286,7 +331,7 @@ namespace ProjectGrapher
                                 relationCount = 0;
                                 for (int k = 0; k < rMatrix.GetLength(1); k++)
                                 {
-                                    if (rMatrix[i,k] == 1)
+                                    if (rMatrix[i, k] == 1)
                                     {
                                         relationCount++;
                                     }
@@ -298,9 +343,10 @@ namespace ProjectGrapher
                                     {
                                         indexX += 1;
                                         isVisited[indexY, indexX] = true;
-                                        drawGraph(0, 0, graph);
+
+                                        drawGraph(graphX, graphY, graph);
                                         drawGraph(80, 6, rMatrix, 1);
-                                        drawText(indexX, indexY, "!");
+                                        drawText(indexX + 2, indexY + 2, "!");
                                         Thread.Sleep(MillisecondsTimeout);
                                     }
                                 }
@@ -311,9 +357,10 @@ namespace ProjectGrapher
                                     {
                                         indexY -= 1;
                                         isVisited[indexY, indexX] = true;
-                                        drawGraph(0, 0, graph);
+
+                                        drawGraph(graphX, graphY, graph);
                                         drawGraph(80, 6, rMatrix, 1);
-                                        drawText(indexX, indexY, "!");
+                                        drawText(indexX + 2, indexY + 2, "!");
                                         Thread.Sleep(MillisecondsTimeout);
                                     }
                                 }
@@ -324,9 +371,9 @@ namespace ProjectGrapher
                                     {
                                         indexX -= 1;
                                         isVisited[indexY, indexX] = true;
-                                        drawGraph(0, 0, graph);
+                                        drawGraph(graphX, graphY, graph);
                                         drawGraph(80, 6, rMatrix, 1);
-                                        drawText(indexX, indexY, "!");
+                                        drawText(indexX + 2, indexY + 2, "!");
                                         Thread.Sleep(MillisecondsTimeout);
                                     }
                                 }
@@ -337,9 +384,9 @@ namespace ProjectGrapher
                                     {
                                         indexY += 1;
                                         isVisited[indexY, indexX] = true;
-                                        drawGraph(0, 0, graph);
+                                        drawGraph(graphX, graphY, graph);
                                         drawGraph(80, 6, rMatrix, 1);
-                                        drawText(indexX, indexY, "!");
+                                        drawText(indexX + 2, indexY + 2, "!");
                                         Thread.Sleep(MillisecondsTimeout);
                                     }
                                 }
@@ -351,9 +398,9 @@ namespace ProjectGrapher
                                         indexY -= 1;
                                         indexX += 1;
                                         isVisited[indexY, indexX] = true;
-                                        drawGraph(0, 0, graph);
+                                        drawGraph(graphX, graphY, graph);
                                         drawGraph(80, 6, rMatrix, 1);
-                                        drawText(indexX, indexY, "!");
+                                        drawText(indexX + 2, indexY + 2, "!");
                                         Thread.Sleep(MillisecondsTimeout);
                                     }
                                 }
@@ -365,9 +412,9 @@ namespace ProjectGrapher
                                         indexY -= 1;
                                         indexX -= 1;
                                         isVisited[indexY, indexX] = true;
-                                        drawGraph(0, 0, graph);
+                                        drawGraph(graphX, graphY, graph);
                                         drawGraph(80, 6, rMatrix, 1);
-                                        drawText(indexX, indexY, "!");
+                                        drawText(indexX + 2, indexY + 2, "!");
                                         Thread.Sleep(MillisecondsTimeout);
                                     }
                                 }
@@ -379,9 +426,9 @@ namespace ProjectGrapher
                                         indexY += 1;
                                         indexX += 1;
                                         isVisited[indexY, indexX] = true;
-                                        drawGraph(0, 0, graph);
+                                        drawGraph(graphX, graphY, graph);
                                         drawGraph(80, 6, rMatrix, 1);
-                                        drawText(indexX, indexY, "!");
+                                        drawText(indexX + 2, indexY + 2, "!");
                                         Thread.Sleep(MillisecondsTimeout);
                                     }
                                 }
@@ -394,9 +441,9 @@ namespace ProjectGrapher
                                         indexY += 1;
                                         indexX -= 1;
                                         isVisited[indexY, indexX] = true;
-                                        drawGraph(0, 0, graph);
+                                        drawGraph(graphX, graphY, graph);
                                         drawGraph(80, 6, rMatrix, 1);
-                                        drawText(indexX, indexY, "!");
+                                        drawText(indexX + 2, indexY + 2, "!");
                                         Thread.Sleep(MillisecondsTimeout);
                                     }
                                 }
@@ -419,9 +466,8 @@ namespace ProjectGrapher
                                     Console.SetCursorPosition(78, 6 + k);
                                     Console.Write(nodeNames[k]);
                                 }
-
-                                drawGraph(0, 0, graph);
-                                drawText(indexX, indexY, "!");
+                                drawGraph(graphX, graphY, graph);
+                                drawText(indexX + 2, indexY + 2, "!");
 
                                 Thread.Sleep(MillisecondsTimeout);
                             }
@@ -449,8 +495,8 @@ namespace ProjectGrapher
             int cursorX = 20;
             int cursorY = 24;
 
-            int graphXOffset = 0;
-            int graphYOffset = 0;
+            int graphXOffset = 2;
+            int graphYOffset = 2;
 
             int[,] nthMatrix = new int[1, 1];
             int[,] rStarMatrix = new int[1, 1];
@@ -474,14 +520,7 @@ namespace ProjectGrapher
                 }
             }
 
-            //for (int i = 0; i < graph.GetLength(0); i++)
-            //{
-            //    for (int j = 0; j < graph.GetLength(1); j++)
-            //    {
-            //        Console.Write(graph[i, j]);
-            //    }
-            //    Console.Write("\n");
-            //}
+
 
             while (true)
             {
@@ -495,9 +534,12 @@ namespace ProjectGrapher
                 {
                     Console.Clear();
 
+                    design(graphHeight, graphWidth);
                     // drawing a graph
                     while (true)
                     {
+
+
                         drawGraph(graphXOffset, graphYOffset, graph);
 
                         // draws the cursor
@@ -584,30 +626,24 @@ namespace ProjectGrapher
                                 }
                             }
                         }
-
+                        char temp='~';
                         // we will make a function to achieve this.
-                        Array.Sort(nodeNames);
+                        //Array.Sort(nodeNames);
+                        for (int i = 0; i < nodeNames.Length; i++)
+                        {
+                            if (nodeNames[i] != temp && nodeNames[i] < temp)
+                            {
+                                temp = nodeNames[i];
+                                
+                            }
+                        }
 
-                        //if (flag)
-                        //{
-                        //    // defining the r matricies
-                        //    rMatrix = new int[nodeCount, nodeCount];
-                        //    for (int row = 0; row < rMatrix.GetLength(0); row++)
-                        //    {
-                        //        for (int col = 0; col < rMatrix.GetLength(1); col++)
-                        //        {
-                        //            // assigns one and zeros randomly for debugging
-                        //            rMatrix[row, col] = rand.Next(2);
-                        //        }
-                        //    }
-                        //    flag = false;
-                        //}
                         if (flag)
                         {
                             rMatrix = findRelation(graph);
                             flag = false;
                         }
-                        
+
 
                         // calculate r star
                         rStarMatrix = new int[nodeCount, nodeCount];
@@ -673,6 +709,7 @@ namespace ProjectGrapher
                             Console.SetCursorPosition(78, 17 + i);
                             Console.Write(nodeNames[i]);
                         }
+
 
                         drawText(80, 4, $"r{nthMatrixInput} matrix is:");
                         drawGraph(80, 6, nthMatrix, 1);
