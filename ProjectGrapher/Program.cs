@@ -142,6 +142,7 @@ namespace ProjectGrapher
 
             int i = 0;
             char node;
+
             char[] nodeNeighbours = new char[8];
 
             char[] initialNeighbours = new char[8];
@@ -193,6 +194,7 @@ namespace ProjectGrapher
                             indexX = col;
                             indexY = row;
 
+                            // counts the amount of plus character around the node so that we can know how many relation it should have
                             plusCount = 0;
                             for (int k = 0; k < initialNeighbours.Length; k++)
                             {
@@ -202,17 +204,11 @@ namespace ProjectGrapher
                                 }
                             }
 
-
-                            
-
                             while (trace)
                             {
-
-                                
+                                isVisited[indexY, indexX] = true;
 
                                 found = false;
-
-                                isVisited[indexY, indexX] = true;
 
                                 if (graph[indexY, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
                                 {
@@ -283,10 +279,12 @@ namespace ProjectGrapher
                                     }
                                     break;
                                 }
+
+                                // count the detected relations of the current node
                                 relationCount = 0;
                                 for (int k = 0; k < rMatrix.GetLength(1); k++)
                                 {
-                                    if (rMatrix[i,k] == 1)
+                                    if (rMatrix[i, k] == 1)
                                     {
                                         relationCount++;
                                     }
@@ -304,6 +302,77 @@ namespace ProjectGrapher
                                         Thread.Sleep(MillisecondsTimeout);
                                     }
                                 }
+                                found = false;
+
+                                if (graph[indexY, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexX -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    indexX -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    indexX -= 1;
+                                    found = true;
+                                }
+
+                                drawGraph(0, 0, graph);
+                                drawGraph(80, 6, rMatrix, 1);
+                                drawText(indexX, indexY, "!");
+                                Thread.Sleep(MillisecondsTimeout);
+
+                                if (found)
+                                {
+                                    nodeNeighbours = findNeighbours(indexY, indexX, graph);
+
+                                    // add to r matrix
+                                    for (int k = 0; k < nodeNeighbours.Length; k++)
+                                    {
+                                        for (int m = 0; m < nodeNames.Length; m++)
+                                        {
+                                            if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                            {
+                                                rMatrix[i, m] = 1;
+                                                //trace = false;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    break;
+                                }
 
                                 if (!isVisited[indexY - 1, indexX])
                                 {
@@ -316,6 +385,77 @@ namespace ProjectGrapher
                                         drawText(indexX, indexY, "!");
                                         Thread.Sleep(MillisecondsTimeout);
                                     }
+                                }
+                                found = false;
+
+                                if (graph[indexY, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexX -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    indexX -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    indexX -= 1;
+                                    found = true;
+                                }
+
+                                drawGraph(0, 0, graph);
+                                drawGraph(80, 6, rMatrix, 1);
+                                drawText(indexX, indexY, "!");
+                                Thread.Sleep(MillisecondsTimeout);
+
+                                if (found)
+                                {
+                                    nodeNeighbours = findNeighbours(indexY, indexX, graph);
+
+                                    // add to r matrix
+                                    for (int k = 0; k < nodeNeighbours.Length; k++)
+                                    {
+                                        for (int m = 0; m < nodeNames.Length; m++)
+                                        {
+                                            if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                            {
+                                                rMatrix[i, m] = 1;
+                                                //trace = false;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    break;
                                 }
 
                                 if (!isVisited[indexY, indexX - 1])
@@ -331,6 +471,77 @@ namespace ProjectGrapher
                                     }
                                 }
 
+                                found = false;
+
+                                if (graph[indexY, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexX -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    indexX -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    indexX -= 1;
+                                    found = true;
+                                }
+
+                                drawGraph(0, 0, graph);
+                                drawGraph(80, 6, rMatrix, 1);
+                                drawText(indexX, indexY, "!");
+                                Thread.Sleep(MillisecondsTimeout);
+
+                                if (found)
+                                {
+                                    nodeNeighbours = findNeighbours(indexY, indexX, graph);
+
+                                    // add to r matrix
+                                    for (int k = 0; k < nodeNeighbours.Length; k++)
+                                    {
+                                        for (int m = 0; m < nodeNames.Length; m++)
+                                        {
+                                            if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                            {
+                                                rMatrix[i, m] = 1;
+                                                //trace = false;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    break;
+                                }
                                 if (!isVisited[indexY + 1, indexX])
                                 {
                                     while (graph[indexY + 1, indexX] == '+') // going down
@@ -342,6 +553,78 @@ namespace ProjectGrapher
                                         drawText(indexX, indexY, "!");
                                         Thread.Sleep(MillisecondsTimeout);
                                     }
+                                }
+
+                                found = false;
+
+                                if (graph[indexY, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexX -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    indexX -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    indexX -= 1;
+                                    found = true;
+                                }
+
+                                drawGraph(0, 0, graph);
+                                drawGraph(80, 6, rMatrix, 1);
+                                drawText(indexX, indexY, "!");
+                                Thread.Sleep(MillisecondsTimeout);
+
+                                if (found)
+                                {
+                                    nodeNeighbours = findNeighbours(indexY, indexX, graph);
+
+                                    // add to r matrix
+                                    for (int k = 0; k < nodeNeighbours.Length; k++)
+                                    {
+                                        for (int m = 0; m < nodeNames.Length; m++)
+                                        {
+                                            if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                            {
+                                                rMatrix[i, m] = 1;
+                                                //trace = false;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    break;
                                 }
 
                                 if (!isVisited[indexY - 1, indexX + 1])
@@ -358,6 +641,78 @@ namespace ProjectGrapher
                                     }
                                 }
 
+                                found = false;
+
+                                if (graph[indexY, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexX -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    indexX -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    indexX -= 1;
+                                    found = true;
+                                }
+
+                                drawGraph(0, 0, graph);
+                                drawGraph(80, 6, rMatrix, 1);
+                                drawText(indexX, indexY, "!");
+                                Thread.Sleep(MillisecondsTimeout);
+
+                                if (found)
+                                {
+                                    nodeNeighbours = findNeighbours(indexY, indexX, graph);
+
+                                    // add to r matrix
+                                    for (int k = 0; k < nodeNeighbours.Length; k++)
+                                    {
+                                        for (int m = 0; m < nodeNames.Length; m++)
+                                        {
+                                            if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                            {
+                                                rMatrix[i, m] = 1;
+                                                //trace = false;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    break;
+                                }
+
                                 if (!isVisited[indexY - 1, indexX - 1])
                                 {
                                     while (graph[indexY - 1, indexX - 1] == '+') // going north west
@@ -370,6 +725,78 @@ namespace ProjectGrapher
                                         drawText(indexX, indexY, "!");
                                         Thread.Sleep(MillisecondsTimeout);
                                     }
+                                }
+
+                                found = false;
+
+                                if (graph[indexY, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexX -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    indexX -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    indexX -= 1;
+                                    found = true;
+                                }
+
+                                drawGraph(0, 0, graph);
+                                drawGraph(80, 6, rMatrix, 1);
+                                drawText(indexX, indexY, "!");
+                                Thread.Sleep(MillisecondsTimeout);
+
+                                if (found)
+                                {
+                                    nodeNeighbours = findNeighbours(indexY, indexX, graph);
+
+                                    // add to r matrix
+                                    for (int k = 0; k < nodeNeighbours.Length; k++)
+                                    {
+                                        for (int m = 0; m < nodeNames.Length; m++)
+                                        {
+                                            if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                            {
+                                                rMatrix[i, m] = 1;
+                                                //trace = false;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    break;
                                 }
 
                                 if (!isVisited[indexY + 1, indexX + 1])
@@ -386,6 +813,77 @@ namespace ProjectGrapher
                                     }
                                 }
 
+                                found = false;
+
+                                if (graph[indexY, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexX -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    indexX -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    indexX -= 1;
+                                    found = true;
+                                }
+
+                                drawGraph(0, 0, graph);
+                                drawGraph(80, 6, rMatrix, 1);
+                                drawText(indexX, indexY, "!");
+                                Thread.Sleep(MillisecondsTimeout);
+
+                                if (found)
+                                {
+                                    nodeNeighbours = findNeighbours(indexY, indexX, graph);
+
+                                    // add to r matrix
+                                    for (int k = 0; k < nodeNeighbours.Length; k++)
+                                    {
+                                        for (int m = 0; m < nodeNames.Length; m++)
+                                        {
+                                            if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                            {
+                                                rMatrix[i, m] = 1;
+                                                //trace = false;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    break;
+                                }
 
                                 if (!isVisited[indexY + 1, indexX - 1])
                                 {
@@ -400,13 +898,83 @@ namespace ProjectGrapher
                                         Thread.Sleep(MillisecondsTimeout);
                                     }
                                 }
+                                found = false;
 
+                                if (graph[indexY, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexX -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY - 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY -= 1;
+                                    indexX -= 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    indexX += 1;
+                                    found = true;
+                                }
+                                if (graph[indexY + 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
+                                {
+                                    indexY += 1;
+                                    indexX -= 1;
+                                    found = true;
+                                }
 
+                                drawGraph(0, 0, graph);
+                                drawGraph(80, 6, rMatrix, 1);
+                                drawText(indexX, indexY, "!");
+                                Thread.Sleep(MillisecondsTimeout);
+
+                                if (found)
+                                {
+                                    nodeNeighbours = findNeighbours(indexY, indexX, graph);
+
+                                    // add to r matrix
+                                    for (int k = 0; k < nodeNeighbours.Length; k++)
+                                    {
+                                        for (int m = 0; m < nodeNames.Length; m++)
+                                        {
+                                            if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                            {
+                                                rMatrix[i, m] = 1;
+                                                //trace = false;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    break;
+                                }
+
+                                // if amount of the relations the algortihm has found is equal to  the plus node amount around the initial node stop tracing
                                 if (relationCount == plusCount)
                                 {
                                     trace = false;
                                 }
-
 
                                 for (int k = 0; k < nodeNames.Length; k++)
                                 {
@@ -607,7 +1175,6 @@ namespace ProjectGrapher
                             rMatrix = findRelation(graph);
                             flag = false;
                         }
-                        
 
                         // calculate r star
                         rStarMatrix = new int[nodeCount, nodeCount];
