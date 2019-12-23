@@ -9,6 +9,9 @@ namespace ProjectGrapher
         // TODO: query of the min nodes
         // TODO: design
         // TODO: maybe making the code proper
+        // TODO: out of bound error in drawing menu
+        // TODO: checking for same letters in drawing
+
         public const int graphWidth = 40;
         public const int graphHeight = 25;
         private const int MillisecondsTimeout = 0;
