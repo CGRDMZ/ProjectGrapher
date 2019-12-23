@@ -6,6 +6,9 @@ namespace ProjectGrapher
 {
     internal class Program
     {
+        // TODO: query of the min nodes
+        // TODO: design
+        // TODO: maybe making the code proper
         public const int graphWidth = 40;
         public const int graphHeight = 25;
         private const int MillisecondsTimeout = 0;
@@ -1022,8 +1025,13 @@ namespace ProjectGrapher
 
             int[,] nthMatrix = new int[1, 1];
             int[,] rStarMatrix = new int[1, 1];
+            int[,] rMinMatrix = new int[1, 1];
+            int[,] tempMatrix = new int[1, 1];
+            bool[,] foundArray;
 
             int nthMatrixInput = 1;
+
+            bool found;
 
             Random rand = new Random();
 
@@ -1058,6 +1066,7 @@ namespace ProjectGrapher
                 cki = Console.ReadKey(true);
                 option = (int)cki.Key;
                 nthMatrixInput = 1;
+                
 
                 if (option == (int)ConsoleKey.D1)
                 {
@@ -1123,8 +1132,10 @@ namespace ProjectGrapher
                 {
                     Console.Clear();
                     flag = true;
+
                     while (true)
                     {
+
                         //counting node number
                         nodeCount = 0;
                         for (int row = 0; row < graph.GetLength(0); row++)
@@ -1179,12 +1190,17 @@ namespace ProjectGrapher
                         // calculate r star
                         rStarMatrix = new int[nodeCount, nodeCount];
                         nthMatrix = new int[nodeCount, nodeCount];
+                        rMinMatrix = new int[nodeCount, nodeCount];
+                        tempMatrix = new int[nodeCount, nodeCount];
+                        foundArray = new bool[nodeCount, nodeCount];
 
                         for (int i = 0; i < rMatrix.GetLength(0); i++)
                         {
                             for (int j = 0; j < rMatrix.GetLength(1); j++)
                             {
                                 nthMatrix[i, j] = rMatrix[i, j];
+                                rMinMatrix[i, j] = 0;
+                                foundArray[i, j] = false;
                             }
                         }
                         for (int i = 0; i < nodeCount; i++)
@@ -1196,6 +1212,11 @@ namespace ProjectGrapher
                                     if (nthMatrix[row, col] == 1)
                                     {
                                         rStarMatrix[row, col] = 1;
+                                        if (!foundArray[row,col])
+                                        {
+                                            rMinMatrix[row, col] = i + 1;
+                                            foundArray[row, col] = true;
+                                        }
                                     }
                                 }
                             }
@@ -1214,6 +1235,9 @@ namespace ProjectGrapher
                         {
                             nthMatrix = matrixMultipicator2D(nthMatrix, rMatrix);
                         }
+
+
+                        
 
                         drawGraph(graphXOffset, graphYOffset, graph);
 
@@ -1246,6 +1270,10 @@ namespace ProjectGrapher
 
                         drawText(80, 15, "r* matrix is:");
                         drawGraph(80, 17, rStarMatrix, 1);
+
+
+                        drawText(50, 15, "r* matrix is:");
+                        drawGraph(50, 17, rMinMatrix, 1);
 
                         ckiCalc = Console.ReadKey(true);
 
