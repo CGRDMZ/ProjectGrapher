@@ -16,24 +16,33 @@ namespace ProjectGrapher
         public static int graphX = 2;
         public static int graphY = 2;
 
+        public static bool found;
+
         public static char[] nodeNames = new char[1];
+
         public static int[,] rMatrix = new int[1, 1];
+        public static char[,] graph = new char[graphHeight, graphWidth];
+
+        public static int indexX;
+        public static int indexY;
 
         private static void design(int graphHeight, int graphWidth)
         {
             int num = 0;
             for (int k = 0; k < graphHeight; k++)
             {
-                Console.SetCursorPosition(0, 2 + k);
+                Console.SetCursorPosition(graphX - 2, graphY + k);
                 Console.Write(num);
                 num++;
                 if (num == 10)
+                {
                     num = 0;
+                }
             }
             num = 0;
             for (int l = 0; l < graphWidth; l++)
             {
-                Console.SetCursorPosition(2 + l, 0);
+                Console.SetCursorPosition(graphX + l, graphY - 2);
                 Console.Write(num);
                 num++;
                 if (num == 10)
@@ -43,22 +52,22 @@ namespace ProjectGrapher
             }
             for (int i = 0; i < graphHeight; i++)
             {
-                Console.SetCursorPosition(1, 2 + i);
+                Console.SetCursorPosition(graphX - 1, graphY + i);
                 Console.Write("#");
             }
             for (int i = 0; i < graphHeight; i++)
             {
-                Console.SetCursorPosition(42, 2 + i);
+                Console.SetCursorPosition(graphX + graphWidth, graphY + i);
                 Console.Write("#");
             }
             for (int m = 0; m < graphWidth + 2; m++)
             {
-                Console.SetCursorPosition(1 + m, 1);
+                Console.SetCursorPosition(graphX - 1 + m, graphY - 1);
                 Console.Write("#");
             }
             for (int m = 0; m < graphWidth + 2; m++)
             {
-                Console.SetCursorPosition(1 + m, 27);
+                Console.SetCursorPosition(graphX - 1 + m, graphY + graphHeight);
                 Console.Write("#");
             }
         }
@@ -125,6 +134,56 @@ namespace ProjectGrapher
             return matrix3;
         }
 
+        private static void checkForX()
+        {
+            found = false;
+
+            if (indexX < graphWidth - 1 && graph[indexY, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'P' && graph[indexY, indexX] >= 'A'))
+            {
+                indexX += 1;
+                found = true;
+            }
+            if (indexY > 0 && graph[indexY - 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'P' && graph[indexY, indexX] >= 'A'))
+            {
+                indexY -= 1;
+                found = true;
+            }
+            if (indexX > 0 && graph[indexY, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'P' && graph[indexY, indexX] >= 'A'))
+            {
+                indexX -= 1;
+                found = true;
+            }
+            if (indexY < graphHeight - 1 && graph[indexY + 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'P' && graph[indexY, indexX] >= 'A'))
+            {
+                indexY += 1;
+                found = true;
+            }
+            if (indexY > 0 && indexX < graphWidth - 1 && graph[indexY - 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'P' && graph[indexY, indexX] >= 'A'))
+            {
+                indexY -= 1;
+                indexX += 1;
+                found = true;
+            }
+            if (indexY > 0 && indexX > 0 && graph[indexY - 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'P' && graph[indexY, indexX] >= 'A'))
+            {
+                indexY -= 1;
+                indexX -= 1;
+                found = true;
+            }
+            if (indexX < graphWidth - 1 && indexY < graphHeight - 1 && graph[indexY + 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'P' && graph[indexY, indexX] >= 'A'))
+            {
+                indexY += 1;
+                indexX += 1;
+                found = true;
+            }
+            if (indexY < graphHeight - 1 && indexX > 0 && graph[indexY + 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'P' && graph[indexY, indexX] >= 'A'))
+            {
+                indexY += 1;
+                indexX -= 1;
+                found = true;
+            }
+        }
+
         private static char[] findNeighbours(int row, int col, char[,] graph, bool diagonal = true)
         {
             char[] neighbours = new char[8];
@@ -140,7 +199,7 @@ namespace ProjectGrapher
                 {
                     if (diagonal)
                     {
-                        if (!(k == 0 && l == 0) && row + k > 0 && row + k < graph.GetLength(0) && col + l > 0 && col + l < graph.GetLength(1))
+                        if (!(k == 0 && l == 0) && row + k > 0 && row + k < graph.GetLength(0) - 1 && col + l > 0 && col + l < graph.GetLength(1) - 1)
                         {
                             neighbours[counter] = graph[row + k, col + l];
                             if (counter < neighbours.Length - 1)
@@ -211,15 +270,13 @@ namespace ProjectGrapher
                 }
             }
 
-            int indexX;
-            int indexY;
+            //int indexX;
+            //int indexY;
 
             int xDiff;
             int yDiff;
 
             bool trace;
-
-            bool found;
 
             int plusCount;
             int relationCount = 0;
@@ -233,6 +290,15 @@ namespace ProjectGrapher
                         initialNeighbours = findNeighbours(row, col, graph);
 
                         trace = true;
+
+                        relationCount = 0;
+                        for (int k = 0; k < rMatrix.GetLength(1); k++)
+                        {
+                            if (rMatrix[i, k] == 1)
+                            {
+                                relationCount++;
+                            }
+                        }
 
                         for (int j = 0; j < initialNeighbours.Length; j++)
                         {
@@ -263,52 +329,7 @@ namespace ProjectGrapher
                                     }
                                 }
 
-                                found = false;
-
-                                if (indexX < graphWidth - 1 && graph[indexY, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && graph[indexY - 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    found = true;
-                                }
-                                if (indexX > 0 && graph[indexY, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexX -= 1;
-                                    found = true;
-                                }
-                                if (indexY < graphHeight - 1 && graph[indexY + 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && indexX < graphWidth - 1 && graph[indexY - 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && indexX > 0 && graph[indexY - 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    indexX -= 1;
-                                    found = true;
-                                }
-                                if (indexX < graphWidth - 1 && indexY < graphHeight - 1 && graph[indexY + 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY < graphHeight - 1 && indexX > 0 && graph[indexY + 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    indexX -= 1;
-                                    found = true;
-                                }
+                                checkForX();
 
                                 drawGraph(graphX, graphY, graph);
                                 drawGraph(80, 6, rMatrix, 1);
@@ -324,7 +345,7 @@ namespace ProjectGrapher
                                     {
                                         for (int m = 0; m < nodeNames.Length; m++)
                                         {
-                                            if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                            if (nodeNeighbours[k] <= 'P' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
                                             {
                                                 rMatrix[i, m] = 1;
                                                 //trace = false;
@@ -337,7 +358,7 @@ namespace ProjectGrapher
 
                                 if (indexX < graphWidth - 1 && !isVisited[indexY, indexX + 1])
                                 {
-                                    while (graph[indexY, indexX + 1] == '+') // going right
+                                    while (indexX < graphWidth - 1 && graph[indexY, indexX + 1] == '+') // going right
                                     {
                                         indexX += 1;
                                         isVisited[indexY, indexX] = true;
@@ -347,52 +368,7 @@ namespace ProjectGrapher
                                         Thread.Sleep(MillisecondsTimeout);
                                     }
                                 }
-                                found = false;
-
-                                if (indexX < graphWidth - 1 && graph[indexY, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && graph[indexY - 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    found = true;
-                                }
-                                if (indexX > 0 && graph[indexY, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexX -= 1;
-                                    found = true;
-                                }
-                                if (indexY < graphHeight - 1 && graph[indexY + 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && indexX < graphWidth - 1 && graph[indexY - 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && indexX > 0 && graph[indexY - 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    indexX -= 1;
-                                    found = true;
-                                }
-                                if (indexX < graphWidth - 1 && indexY < graphHeight - 1 && graph[indexY + 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY < graphHeight - 1 && indexX > 0 && graph[indexY + 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    indexX -= 1;
-                                    found = true;
-                                }
+                                checkForX();
 
                                 drawGraph(graphX, graphY, graph);
                                 drawGraph(80, 6, rMatrix, 1);
@@ -408,7 +384,7 @@ namespace ProjectGrapher
                                     {
                                         for (int m = 0; m < nodeNames.Length; m++)
                                         {
-                                            if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                            if (nodeNeighbours[k] <= 'P' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
                                             {
                                                 rMatrix[i, m] = 1;
                                                 //trace = false;
@@ -421,7 +397,7 @@ namespace ProjectGrapher
 
                                 if (indexY > 0 && !isVisited[indexY - 1, indexX])
                                 {
-                                    while (graph[indexY - 1, indexX] == '+') // going up
+                                    while (indexY > 0 && graph[indexY - 1, indexX] == '+') // going up
                                     {
                                         indexY -= 1;
                                         isVisited[indexY, indexX] = true;
@@ -431,52 +407,8 @@ namespace ProjectGrapher
                                         Thread.Sleep(MillisecondsTimeout);
                                     }
                                 }
-                                found = false;
 
-                                if (indexX < graphWidth - 1 && graph[indexY, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && graph[indexY - 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    found = true;
-                                }
-                                if (indexX > 0 && graph[indexY, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexX -= 1;
-                                    found = true;
-                                }
-                                if (indexY < graphHeight - 1 && graph[indexY + 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && indexX < graphWidth - 1 && graph[indexY - 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && indexX > 0 && graph[indexY - 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    indexX -= 1;
-                                    found = true;
-                                }
-                                if (indexX < graphWidth - 1 && indexY < graphHeight - 1 && graph[indexY + 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY < graphHeight - 1 && indexX > 0 && graph[indexY + 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    indexX -= 1;
-                                    found = true;
-                                }
+                                checkForX();
 
                                 drawGraph(graphX, graphY, graph);
                                 drawGraph(80, 6, rMatrix, 1);
@@ -492,7 +424,7 @@ namespace ProjectGrapher
                                     {
                                         for (int m = 0; m < nodeNames.Length; m++)
                                         {
-                                            if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                            if (nodeNeighbours[k] <= 'P' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
                                             {
                                                 rMatrix[i, m] = 1;
                                                 //trace = false;
@@ -505,7 +437,7 @@ namespace ProjectGrapher
 
                                 if (indexX > 0 && !isVisited[indexY, indexX - 1])
                                 {
-                                    while (graph[indexY, indexX - 1] == '+') // going left
+                                    while (indexX > 0 && graph[indexY, indexX - 1] == '+') // going left
                                     {
                                         indexX -= 1;
                                         isVisited[indexY, indexX] = true;
@@ -516,52 +448,7 @@ namespace ProjectGrapher
                                     }
                                 }
 
-                                found = false;
-
-                                if (indexX < graphWidth - 1 && graph[indexY, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && graph[indexY - 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    found = true;
-                                }
-                                if (indexX > 0 && graph[indexY, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexX -= 1;
-                                    found = true;
-                                }
-                                if (indexY < graphHeight - 1 && graph[indexY + 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && indexX < graphWidth - 1 && graph[indexY - 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && indexX > 0 && graph[indexY - 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    indexX -= 1;
-                                    found = true;
-                                }
-                                if (indexX < graphWidth - 1 && indexY < graphHeight - 1 && graph[indexY + 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY < graphHeight - 1 && indexX > 0 && graph[indexY + 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    indexX -= 1;
-                                    found = true;
-                                }
+                                checkForX();
 
                                 drawGraph(graphX, graphY, graph);
                                 drawGraph(80, 6, rMatrix, 1);
@@ -577,7 +464,7 @@ namespace ProjectGrapher
                                     {
                                         for (int m = 0; m < nodeNames.Length; m++)
                                         {
-                                            if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                            if (nodeNeighbours[k] <= 'P' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
                                             {
                                                 rMatrix[i, m] = 1;
                                                 //trace = false;
@@ -589,7 +476,7 @@ namespace ProjectGrapher
                                 }
                                 if (indexY < graphHeight - 1 && !isVisited[indexY + 1, indexX])
                                 {
-                                    while (graph[indexY + 1, indexX] == '+') // going down
+                                    while (indexY < graphHeight - 1 && graph[indexY + 1, indexX] == '+') // going down
                                     {
                                         indexY += 1;
                                         isVisited[indexY, indexX] = true;
@@ -600,58 +487,14 @@ namespace ProjectGrapher
                                     }
                                 }
 
-                                found = false;
-
-                                if (indexX < graphWidth - 1 && graph[indexY, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && graph[indexY - 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    found = true;
-                                }
-                                if (indexX > 0 && graph[indexY, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexX -= 1;
-                                    found = true;
-                                }
-                                if (indexY < graphHeight - 1 && graph[indexY + 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && indexX < graphWidth - 1 && graph[indexY - 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && indexX > 0 && graph[indexY - 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    indexX -= 1;
-                                    found = true;
-                                }
-                                if (indexX < graphWidth - 1 && indexY < graphHeight - 1 && graph[indexY + 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY < graphHeight - 1 && indexX > 0 && graph[indexY + 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    indexX -= 1;
-                                    found = true;
-                                }
+                                checkForX();
 
                                 drawGraph(graphX, graphY, graph);
                                 drawGraph(80, 6, rMatrix, 1);
                                 drawText(graphX + indexX, graphY + indexY, "!");
                                 Thread.Sleep(MillisecondsTimeout);
 
+                                // this part is repeated for every direction but since we use break statements it was not possible to make a function
                                 if (found)
                                 {
                                     nodeNeighbours = findNeighbours(indexY, indexX, graph);
@@ -661,7 +504,7 @@ namespace ProjectGrapher
                                     {
                                         for (int m = 0; m < nodeNames.Length; m++)
                                         {
-                                            if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                            if (nodeNeighbours[k] <= 'P' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
                                             {
                                                 rMatrix[i, m] = 1;
                                                 //trace = false;
@@ -674,7 +517,7 @@ namespace ProjectGrapher
 
                                 if (indexY > 0 && indexX < graphWidth - 1 && !isVisited[indexY - 1, indexX + 1])
                                 {
-                                    while (graph[indexY - 1, indexX + 1] == '+') // going north east
+                                    while (indexY > 0 && indexX < graphWidth - 1 && graph[indexY - 1, indexX + 1] == '+') // going north east
                                     {
                                         indexY -= 1;
                                         indexX += 1;
@@ -686,52 +529,7 @@ namespace ProjectGrapher
                                     }
                                 }
 
-                                found = false;
-
-                                if (indexX < graphWidth - 1 && graph[indexY, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && graph[indexY - 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    found = true;
-                                }
-                                if (indexX > 0 && graph[indexY, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexX -= 1;
-                                    found = true;
-                                }
-                                if (indexY < graphHeight - 1 && graph[indexY + 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && indexX < graphWidth - 1 && graph[indexY - 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && indexX > 0 && graph[indexY - 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    indexX -= 1;
-                                    found = true;
-                                }
-                                if (indexX < graphWidth - 1 && indexY < graphHeight - 1 && graph[indexY + 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY < graphHeight - 1 && indexX > 0 && graph[indexY + 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    indexX -= 1;
-                                    found = true;
-                                }
+                                checkForX();
 
                                 drawGraph(graphX, graphY, graph);
                                 drawGraph(80, 6, rMatrix, 1);
@@ -747,7 +545,7 @@ namespace ProjectGrapher
                                     {
                                         for (int m = 0; m < nodeNames.Length; m++)
                                         {
-                                            if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                            if (nodeNeighbours[k] <= 'P' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
                                             {
                                                 rMatrix[i, m] = 1;
                                                 //trace = false;
@@ -760,7 +558,7 @@ namespace ProjectGrapher
 
                                 if (indexX > 0 && indexY > 0 && !isVisited[indexY - 1, indexX - 1])
                                 {
-                                    while (graph[indexY - 1, indexX - 1] == '+') // going north west
+                                    while (indexX > 0 && indexY > 0 && graph[indexY - 1, indexX - 1] == '+') // going north west
                                     {
                                         indexY -= 1;
                                         indexX -= 1;
@@ -772,52 +570,7 @@ namespace ProjectGrapher
                                     }
                                 }
 
-                                found = false;
-
-                                if (indexX < graphWidth - 1 && graph[indexY, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && graph[indexY - 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    found = true;
-                                }
-                                if (indexX > 0 && graph[indexY, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexX -= 1;
-                                    found = true;
-                                }
-                                if (indexY < graphHeight - 1 && graph[indexY + 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && indexX < graphWidth - 1 && graph[indexY - 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && indexX > 0 && graph[indexY - 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    indexX -= 1;
-                                    found = true;
-                                }
-                                if (indexX < graphWidth - 1 && indexY < graphHeight - 1 && graph[indexY + 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY < graphHeight - 1 && indexX > 0 && graph[indexY + 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    indexX -= 1;
-                                    found = true;
-                                }
+                                checkForX();
 
                                 drawGraph(graphX, graphY, graph);
                                 drawGraph(80, 6, rMatrix, 1);
@@ -833,7 +586,7 @@ namespace ProjectGrapher
                                     {
                                         for (int m = 0; m < nodeNames.Length; m++)
                                         {
-                                            if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                            if (nodeNeighbours[k] <= 'P' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
                                             {
                                                 rMatrix[i, m] = 1;
                                                 //trace = false;
@@ -854,7 +607,7 @@ namespace ProjectGrapher
 
                                 if (indexX < graphWidth - 1 && indexY < graphHeight - 1 && !isVisited[indexY + 1, indexX + 1])
                                 {
-                                    while (graph[indexY + 1, indexX + 1] == '+') // going south east
+                                    while (indexX < graphWidth - 1 && indexY < graphHeight - 1 && graph[indexY + 1, indexX + 1] == '+') // going south east
                                     {
                                         indexY += 1;
                                         indexX += 1;
@@ -867,52 +620,7 @@ namespace ProjectGrapher
                                     }
                                 }
 
-                                found = false;
-
-                                if (indexX < graphWidth - 1 && graph[indexY, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && graph[indexY - 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    found = true;
-                                }
-                                if (indexX > 0 && graph[indexY, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexX -= 1;
-                                    found = true;
-                                }
-                                if (indexY < graphHeight - 1 && graph[indexY + 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && indexX < graphWidth - 1 && graph[indexY - 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && indexX > 0 && graph[indexY - 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    indexX -= 1;
-                                    found = true;
-                                }
-                                if (indexX < graphWidth - 1 && indexY < graphHeight - 1 && graph[indexY + 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY < graphHeight - 1 && indexX > 0 && graph[indexY + 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    indexX -= 1;
-                                    found = true;
-                                }
+                                checkForX();
 
                                 drawGraph(graphX, graphY, graph);
                                 drawGraph(80, 6, rMatrix, 1);
@@ -928,7 +636,7 @@ namespace ProjectGrapher
                                     {
                                         for (int m = 0; m < nodeNames.Length; m++)
                                         {
-                                            if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                            if (nodeNeighbours[k] <= 'P' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
                                             {
                                                 rMatrix[i, m] = 1;
                                                 //trace = false;
@@ -941,7 +649,7 @@ namespace ProjectGrapher
 
                                 if (indexX > 0 && indexY < graphHeight - 1 && !isVisited[indexY + 1, indexX - 1])
                                 {
-                                    while (graph[indexY + 1, indexX - 1] == '+' && graph[indexY, indexX - 1] != 'X') // going north west
+                                    while (indexX > 0 && indexY < graphHeight - 1 && graph[indexY + 1, indexX - 1] == '+' && graph[indexY, indexX - 1] != 'X') // going north west
                                     {
                                         indexY += 1;
                                         indexX -= 1;
@@ -954,50 +662,7 @@ namespace ProjectGrapher
                                 }
                                 found = false;
 
-                                if (indexX < graphWidth - 1 && graph[indexY, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && graph[indexY - 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    found = true;
-                                }
-                                if (indexX > 0 && graph[indexY, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexX -= 1;
-                                    found = true;
-                                }
-                                if (indexY < graphHeight - 1 && graph[indexY + 1, indexX] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && indexX < graphWidth - 1 && graph[indexY - 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY > 0 && indexX > 0 && graph[indexY - 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY -= 1;
-                                    indexX -= 1;
-                                    found = true;
-                                }
-                                if (indexX < graphWidth - 1 && indexY < graphHeight - 1 && graph[indexY + 1, indexX + 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    indexX += 1;
-                                    found = true;
-                                }
-                                if (indexY < graphHeight - 1 && indexX > 0 && graph[indexY + 1, indexX - 1] == 'X' && graph[indexY, indexX] != 'X' && !(graph[indexY, indexX] <= 'I' && graph[indexY, indexX] >= 'A'))
-                                {
-                                    indexY += 1;
-                                    indexX -= 1;
-                                    found = true;
-                                }
+                                checkForX();
 
                                 drawGraph(graphX, graphY, graph);
                                 drawGraph(80, 6, rMatrix, 1);
@@ -1013,7 +678,7 @@ namespace ProjectGrapher
                                     {
                                         for (int m = 0; m < nodeNames.Length; m++)
                                         {
-                                            if (nodeNeighbours[k] <= 'I' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
+                                            if (nodeNeighbours[k] <= 'P' && nodeNeighbours[k] >= 'A' && nodeNeighbours[k] == nodeNames[m])
                                             {
                                                 rMatrix[i, m] = 1;
                                                 //trace = false;
@@ -1062,10 +727,26 @@ namespace ProjectGrapher
             return rMatrix;
         }
 
+        public static char[] Sort(char[] arr)
+        {
+            int n = arr.Length;
+            for (int i = 1; i < n; ++i)
+            {
+                char key = arr[i];
+                int j = i - 1;
+
+                while (j >= 0 && arr[j] > key)
+                {
+                    arr[j + 1] = arr[j];
+                    j = j - 1;
+                }
+                arr[j + 1] = key;
+            }
+            return arr;
+        }
+
         private static void Main(string[] args)
         {
-            char[,] graph = new char[graphHeight, graphWidth];
-
             int option;
 
             int cursorX = 20;
@@ -1125,7 +806,7 @@ namespace ProjectGrapher
                         {
                             for (int col = 0; col < graph.GetLength(1); col++)
                             {
-                                if (graph[row, col] != '.' && graph[row, col] != 'X' && graph[row, col] != '+' && graph[row, col] <= 'I' && graph[row, col] >= 'A')
+                                if (graph[row, col] != '.' && graph[row, col] != 'X' && graph[row, col] != '+' && graph[row, col] <= 'P' && graph[row, col] >= 'A')
                                 {
                                     nodeCount++;
                                 }
@@ -1139,7 +820,7 @@ namespace ProjectGrapher
                         {
                             for (int col = 0; col < graph.GetLength(1); col++)
                             {
-                                if (graph[row, col] != '.' && graph[row, col] != 'X' && graph[row, col] != '+' && graph[row, col] <= 'I' && graph[row, col] >= 'A')
+                                if (graph[row, col] != '.' && graph[row, col] != 'X' && graph[row, col] != '+' && graph[row, col] <= 'P' && graph[row, col] >= 'A')
                                 {
                                     nodeNames[counter] = graph[row, col];
                                     counter++;
@@ -1226,7 +907,7 @@ namespace ProjectGrapher
                         {
                             for (int col = 0; col < graph.GetLength(1); col++)
                             {
-                                if (graph[row, col] != '.' && graph[row, col] != 'X' && graph[row, col] != '+' && graph[row, col] <= 'I' && graph[row, col] >= 'A')
+                                if (graph[row, col] != '.' && graph[row, col] != 'X' && graph[row, col] != '+' && graph[row, col] <= 'P' && graph[row, col] >= 'A')
                                 {
                                     nodeCount++;
                                 }
@@ -1240,23 +921,17 @@ namespace ProjectGrapher
                         {
                             for (int col = 0; col < graph.GetLength(1); col++)
                             {
-                                if (graph[row, col] != '.' && graph[row, col] != 'X' && graph[row, col] != '+' && graph[row, col] <= 'I' && graph[row, col] >= 'A')
+                                if (graph[row, col] != '.' && graph[row, col] != 'X' && graph[row, col] != '+' && graph[row, col] <= 'P' && graph[row, col] >= 'A')
                                 {
                                     nodeNames[counter] = graph[row, col];
                                     counter++;
                                 }
                             }
                         }
-                        char temp = '~';
                         // we will make a function to achieve this.
                         //Array.Sort(nodeNames);
-                        for (int i = 0; i < nodeNames.Length; i++)
-                        {
-                            if (nodeNames[i] != temp && nodeNames[i] < temp)
-                            {
-                                temp = nodeNames[i];
-                            }
-                        }
+
+                        nodeNames = Sort(nodeNames);
 
                         if (flag)
                         {
@@ -1313,7 +988,7 @@ namespace ProjectGrapher
                             nthMatrix = matrixMultipicator2D(nthMatrix, rMatrix);
                         }
 
-                        drawGraph(graphXOffset, graphYOffset, graph);
+                        drawGraph(graphX, graphY, graph);
 
                         for (int i = 0; i < nodeNames.Length; i++)
                         {
@@ -1329,30 +1004,65 @@ namespace ProjectGrapher
 
                         for (int i = 0; i < nodeNames.Length; i++)
                         {
-                            Console.SetCursorPosition(80 + i * 2, 16);
+                            Console.SetCursorPosition(80 + i * 2, 17);
                             Console.Write(nodeNames[i]);
                         }
 
                         for (int i = 0; i < nodeNames.Length; i++)
                         {
-                            Console.SetCursorPosition(78, 17 + i);
+                            Console.SetCursorPosition(78, 18 + i);
                             Console.Write(nodeNames[i]);
                         }
 
                         drawText(80, 4, $"r{nthMatrixInput} matrix is:");
                         drawGraph(80, 6, nthMatrix, 1);
 
-                        drawText(80, 15, "r* matrix is:");
-                        drawGraph(80, 17, rStarMatrix, 1);
+                        drawText(80, 16, "r* matrix is:");
+                        drawGraph(80, 18, rStarMatrix, 1);
 
-                        drawText(50, 15, "rMin matrix is:");
-                        drawGraph(50, 12, rMinMatrix, 1);
+                        //drawText(50, 15, "rMin matrix is:");
+                        //drawGraph(50, 12, rMinMatrix, 1);
 
                         ckiCalc = Console.ReadKey(true);
 
                         if (ckiCalc.Key == ConsoleKey.Escape)
                         {
                             break;
+                        }
+                        else if (ckiCalc.Key == ConsoleKey.Q)
+                        {
+
+                            drawText(graphX + graphWidth + 3, graphY / 2, "                                       ");
+                            drawText(graphX + graphWidth + 3, graphY / 2 + 1, "                                   ");
+                            drawText(graphX + graphWidth + 3, graphY / 2 + 2, $"                                  ");
+                            drawText(graphX + graphWidth + 3, graphY / 2 + 3, $"                                  ");
+
+                            drawText(graphX + graphWidth + 3, graphY / 2, "please enter the first node:");
+                            char firstNode = Convert.ToChar(Console.ReadLine().ToUpper());
+                            drawText(graphX + graphWidth + 3, graphY / 2 + 1, "please enter the second node:");
+                            char secondNode = Convert.ToChar(Console.ReadLine().ToUpper());
+                            drawText(graphX + graphWidth + 3, graphY / 2 + 2, $"{firstNode}, {secondNode} (not a valid query)");
+
+                            for (int i = 0; i < nodeNames.Length; i++)
+                            {
+                                if (firstNode == nodeNames[i])
+                                {
+                                    for (int j = 0; j < nodeNames.Length; j++)
+                                    {
+                                        if (secondNode == nodeNames[j])
+                                        {
+                                            if (rMinMatrix[i, j] == 0)
+                                            {
+                                                drawText(graphX + graphWidth + 3, graphY / 2 + 2, $"Not Possible!               ");
+                                            }
+                                            else
+                                            {
+                                                drawText(graphX + graphWidth + 3, graphY / 2 + 2, $"You can go from {firstNode} to {secondNode} in {rMinMatrix[i, j]} steps.");
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                         else
                         {
