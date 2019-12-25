@@ -14,7 +14,7 @@ namespace ProjectGrapher
 
         public const int graphWidth = 40;
         public const int graphHeight = 25;
-        private const int MillisecondsTimeout = 0;
+        private const int MillisecondsTimeout = 100;
         public static int nodeCount = 0;
         public static char[] nodeNames = new char[1];
 
