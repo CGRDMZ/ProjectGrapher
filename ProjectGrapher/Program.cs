@@ -18,7 +18,7 @@ namespace ProjectGrapher
 
         public static bool found;
 
-        public static char[] nodeNames = new char[1];
+        public static char[] nodeNames;
 
         public static int[,] rMatrix = new int[1, 1];
         public static char[,] graph = new char[graphHeight, graphWidth];
@@ -245,7 +245,6 @@ namespace ProjectGrapher
             }
 
             int i = 0;
-            char node;
 
             char[] nodeNeighbours = new char[8];
 
@@ -273,8 +272,6 @@ namespace ProjectGrapher
             //int indexX;
             //int indexY;
 
-            int xDiff;
-            int yDiff;
 
             bool trace;
 
@@ -757,19 +754,18 @@ namespace ProjectGrapher
 
             int[,] nthMatrix = new int[1, 1];
             int[,] rStarMatrix = new int[1, 1];
-            int[,] rMinMatrix = new int[1, 1];
-            int[,] tempMatrix = new int[1, 1];
+            int[,] rMinMatrix;
+            int[,] tempMatrix;
             bool[,] foundArray;
 
             int nthMatrixInput = 1;
 
-            bool found;
 
             Random rand = new Random();
 
-            bool flag = true;
+            bool flag;
 
-            bool valid = false;
+            bool valid;
 
             ConsoleKeyInfo cki;
             ConsoleKeyInfo ckiDraw;
@@ -787,7 +783,21 @@ namespace ProjectGrapher
             while (true)
             {
                 Console.Clear();
-                Console.WriteLine("choose menu (1- draw, 2- calculation, 3- load)");
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine("                             ##########################################################");
+                Console.WriteLine("                                                     - MENU -                          ");
+                Console.WriteLine("                                                                                       ");
+                Console.WriteLine("                                      1 - Draw a Graph                                 ");
+                Console.WriteLine("                                      2 - Calculation                                  ");
+                Console.WriteLine("                                      3 - Load a Graph                                 ");
+                Console.WriteLine("                                      4 - Exit                                         ");
+                Console.WriteLine();
+                Console.WriteLine("                             ##########################################################");
+                Console.WriteLine();
                 cki = Console.ReadKey(true);
                 option = (int)cki.Key;
                 nthMatrixInput = 1;
@@ -874,6 +884,10 @@ namespace ProjectGrapher
                         else if (ckiDraw.Key == ConsoleKey.Escape)
                         {
                             break;
+                        }
+                        else if (ckiDraw.Key == ConsoleKey.OemPeriod)
+                        {
+                            graph[cursorY, cursorX] = '.';
                         }
                         else if (char.ToUpper(ckiDraw.KeyChar) <= 'P' && char.ToUpper(ckiDraw.KeyChar) >= 'A')
                         {
@@ -1076,6 +1090,10 @@ namespace ProjectGrapher
                     Console.WriteLine("please enter the name of the graph:");
                     string name = Console.ReadLine();
                     graph = loadGraph($"{name}.txt");
+                }
+                else if (option == (int) ConsoleKey.D4)
+                {
+                    break;
                 }
             }
         }
